@@ -45,10 +45,25 @@ namespace SageNetTuner
             _encoder = encoder;
             _tuner = tuner;
 
-            CommandElement startCommand = null;
+            var startCommand = GetStartCommand(encoder);
+
+            Logger = LogManager.GetLogger(tuner.Name + ":" + _encoder.Name);
+
+            _executableName = Path.GetFileNameWithoutExtension(startCommand.Path);
+
+            Logger.Debug("PathToExecutable={0}", startCommand.Path);
+            Logger.Debug("CommandLineFormat={0}", startCommand.CommandLineFormat);
+
+            LookForExistingProcessForThisTuner(startCommand.Path);
+
+
+        }
+
+        private CommandElement GetStartCommand(EncoderElement encoder)
+        {
+            CommandElement startCommand;
             if (!string.IsNullOrEmpty(encoder.Path))
             {
-
                 //  Since they defined a Path/CommandLineFormat on the element 
                 //  we'll use it instead of one that might have been defined in the Commands
                 startCommand = encoder.Commands.FirstOrDefault(c => c.Event == CommandEvent.Start);
@@ -64,42 +79,31 @@ namespace SageNetTuner
                                        CommandLineFormat = encoder.CommandLineFormat,
                                    };
                 encoder.Commands.Add(startCommand);
-
             }
             else
             {
                 if (!encoder.Commands.Any())
                 {
-                    throw new InvalidOperationException(string.Format("No commands defined for this encoder: name={0}", encoder.Name));
+                    throw new InvalidOperationException(
+                        string.Format("No commands defined for this encoder: name={0}", encoder.Name));
                 }
-
 
                 if (encoder.Commands.All(c => c.Event != CommandEvent.Start))
                 {
-                    throw new InvalidOperationException(string.Format("No START event commands defined for this encoder: name={0}", encoder.Name));
+                    throw new InvalidOperationException(
+                        string.Format("No START event commands defined for this encoder: name={0}", encoder.Name));
                 }
 
                 startCommand = encoder.Commands.FirstOrDefault(c => c.Event == CommandEvent.Start);
-
             }
-
-            Logger = LogManager.GetLogger(tuner.Name + ":" + _encoder.Name);
-
 
             if (!File.Exists(startCommand.Path))
             {
                 var msg = string.Format("Cannot find capture executable {0}", startCommand.Path);
                 throw new InvalidOperationException(msg);
             }
-
-            _executableName = Path.GetFileNameWithoutExtension(startCommand.Path);
-
-            Logger.Debug("PathToExecutable={0}", startCommand.Path);
-            Logger.Debug("CommandLineFormat={0}", startCommand.CommandLineFormat);
-
-            LookForExistingProcessForThisTuner(startCommand.Path);
-
-
+            
+            return startCommand;
         }
 
         private void Cleanup()
@@ -317,7 +321,7 @@ namespace SageNetTuner
         void ProcessExitedHandler(object sender, EventArgs e)
         {
             var proc = (Process)sender;
-            Logger.Info("Process {0} has exited with code {1}.  Runtime={2}", proc.Id, proc.ExitCode, (proc.ExitTime - proc.StartTime));
+            Logger.Info("Process {0} has exited with code {1}.  Runtime={2}", proc.Id, proc.ExitCode, (proc.StartTime - proc.ExitTime));
 
         }
 
