@@ -2,14 +2,14 @@
 {
     using System.Configuration;
 
-    public class NetworkTunerServiceSection : ConfigurationSection
+    public class SageNetTunerSection : ConfigurationSection
     {
-        private static readonly NetworkTunerServiceSection _configSection = (NetworkTunerServiceSection)ConfigurationManager.GetSection("NetworkTunerService");
-        public static NetworkTunerServiceSection Settings
+        private static readonly SageNetTunerSection ConfigSection = (SageNetTunerSection)ConfigurationManager.GetSection("sageNetTuner");
+        public static SageNetTunerSection Settings
         {
             get
             {
-                return _configSection;
+                return ConfigSection;
             }
         }
 

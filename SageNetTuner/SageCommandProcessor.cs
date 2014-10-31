@@ -27,7 +27,6 @@ namespace SageNetTuner
 
         private readonly ExecutableProcessCaptureManager _executableProcessCapture;
 
-        private readonly Timer _noActivtyTimer;
 
         public SageCommandProcessor(TunerElement tunerSettings, DeviceElement deviceSettings, ExecutableProcessCaptureManager executableProcessCaptureManager)
         {
@@ -37,15 +36,6 @@ namespace SageNetTuner
 
             this._executableProcessCapture = executableProcessCaptureManager;
 
-            _noActivtyTimer= new Timer(TimeSpan.FromSeconds(30).TotalMilliseconds);
-
-            _noActivtyTimer.Elapsed += NoActivtyTimerElapsed;
-        }
-
-        void NoActivtyTimerElapsed(object sender, ElapsedEventArgs e)
-        {
-            //Logger.Warn("No Activity within interval stopping recordings:  {0}", TimeSpan.FromMilliseconds(_noActivtyTimer.Interval));
-            //StopRecording();
         }
 
         public string Name
@@ -113,13 +103,6 @@ namespace SageNetTuner
 
         private string HandleRequest(string request)
         {
-
-            if (_noActivtyTimer.Enabled)
-            {
-                // A command was received so reset the timer.
-                _noActivtyTimer.Stop();
-                _noActivtyTimer.Start();
-            }
 
             Logger.Info("HandleRequest: [{0}]", request);
             var response = "OK";
@@ -259,9 +242,7 @@ namespace SageNetTuner
                 {
                     Logger.Debug("Found Requested Channel: GuideName={0}, GuideNumber={1}, URL={2}", ch.GuideName, ch.GuideNumber, ch.URL);
 
-
-                    this._executableProcessCapture.Start(ch, command.FileName);
-                    _noActivtyTimer.Start();
+                    _executableProcessCapture.Start(ch, command.FileName);
                 }
 
 
@@ -276,8 +257,6 @@ namespace SageNetTuner
 
         private void StopRecording()
         {
-            _noActivtyTimer.Stop();
-
             Logger.Debug("StopRecording:");
             this._executableProcessCapture.Stop();
 

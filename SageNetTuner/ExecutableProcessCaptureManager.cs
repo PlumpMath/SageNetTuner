@@ -20,25 +20,17 @@ namespace SageNetTuner
 
         private readonly TunerElement _tuner;
 
-        private Logger Logger;
+        private readonly Logger Logger;
 
-        private Logger StdOutLogger;
-
-        private readonly string _executable;
-
-        private readonly string _pathToExecutable;
+        private Logger _stdOutLogger;
 
         private Process _currentProcess;
-
-        private readonly string _tunerName;
-
-        private readonly Stopwatch _recordingStopwatch;
-
-        private readonly System.Timers.Timer _timer;
 
         private FileStream _recordingFileStream;
 
         private object[] _replacmentParams;
+
+        private CommandElement _currentCommand;
 
         public string Filename { get; private set; }
 
@@ -91,7 +83,6 @@ namespace SageNetTuner
 
             Logger = LogManager.GetLogger(tuner.Name + ":" + _encoder.Name);
 
-            _executable = Path.GetFileNameWithoutExtension(startCommand.Path);
 
             if (!File.Exists(startCommand.Path))
             {
@@ -99,44 +90,16 @@ namespace SageNetTuner
                 throw new InvalidOperationException(msg);
             }
 
-            _executable = Path.GetFileNameWithoutExtension(startCommand.Path);
-            _commandLineFormat = startCommand.CommandLineFormat;
-
             Logger.Debug("PathToExecutable={0}", startCommand.Path);
             Logger.Debug("CommandLineFormat={0}", startCommand.CommandLineFormat);
 
+            LookForExistingProcessForThisTuner(startCommand.Path);
 
-            _tunerName = tuner.Name;
-
-            LookForExistingProcessForThisTuner();
-
-            _timer = new System.Timers.Timer(TimeSpan.FromSeconds(1).TotalMilliseconds);
-            _timer.Elapsed += TimerOnElapsed;
-            _recordingStopwatch = new Stopwatch();
-
-        }
-
-        private void TimerOnElapsed(object sender, ElapsedEventArgs elapsedEventArgs)
-        {
-            if (_currentProcess == null)
-            {
-                Cleanup();
-                return;
-            }
-
-            if (_currentProcess.HasExited)
-            {
-                Logger.Warn("{0} process has exited unexpectedly.  ExitCode: {1}", _executable, _currentProcess.ExitCode);
-                Cleanup();
-            }
 
         }
 
         private void Cleanup()
         {
-            _recordingStopwatch.Stop();
-            _timer.Stop();
-
             if (_currentProcess != null)
             {
                 Logger.Debug("Cleanup");
@@ -159,16 +122,16 @@ namespace SageNetTuner
 
         }
 
-        private void LookForExistingProcessForThisTuner()
+        private void LookForExistingProcessForThisTuner(string executableName)
         {
             if (_currentProcess == null)
             {
-                var processes = Process.GetProcessesByName(_executable);
+                var processes = Process.GetProcessesByName(executableName);
 
                 foreach (var process in processes)
                 {
 
-                    if (process.MainWindowTitle.Contains(_tunerName))
+                    if (process.MainWindowTitle.Contains(_tuner.Name))
                     {
                         _currentProcess = process;
                         return;
@@ -212,7 +175,7 @@ namespace SageNetTuner
 
             Filename = filename;
 
-            StdOutLogger = LogManager.GetLogger(string.Format("stdout-{0}", filename));
+            _stdOutLogger = LogManager.GetLogger(string.Format("stdout-{0}", Path.GetFileName(filename)));
 
             //var args = string.Format("-i {0} -metadata comment=\"Tuner: {3}\" {1} \"{2}\"", url, this._commandLineFormat, filename, _tunerName);
 
@@ -222,7 +185,7 @@ namespace SageNetTuner
             _replacmentParams[2] = Path.GetFileNameWithoutExtension(filename);
             _replacmentParams[3] = Path.GetExtension(filename);
             _replacmentParams[4] = Path.GetDirectoryName(filename);
-            _replacmentParams[5] = _tunerName;
+            _replacmentParams[5] = _tuner.Name;
             _replacmentParams[6] = channel.GuideName;
             _replacmentParams[7] = channel.GuideNumber;
             _replacmentParams[8] = Guid.NewGuid().ToString();
@@ -238,26 +201,24 @@ namespace SageNetTuner
             {
                 var args = string.Format(startCommand.CommandLineFormat, _replacmentParams);
 
-                Logger.Debug("Starting: [{0} {1}]", this._pathToExecutable, args);
+                Logger.Debug("Starting: [{0} {1}]", startCommand.Path, args);
 
-                _currentProcess=StartProcess(CommandEvent.Start, startCommand, args);
+                _currentProcess = StartProcess(CommandEvent.Start, startCommand, args);
 
                 if (_currentProcess != null)
                 {
                     Thread.Sleep(10);
                     if (_currentProcess.MainWindowHandle != IntPtr.Zero)
-                        SetWindowText(_currentProcess.MainWindowHandle, string.Format("HDHRNetworktuner: {0}", _tunerName));
+                        SetWindowText(_currentProcess.MainWindowHandle, string.Format("SageNetTuner: {0}", _tuner.Name));
 
-                    Logger.Debug("  {0} started: PID={1}, WindowTitle=[{2}]", _executable, _currentProcess.Id, _currentProcess.MainWindowTitle);
+                    Logger.Debug("  {0} started: PID={1}, WindowTitle=[{2}]", _currentProcess.MainModule.FileName, _currentProcess.Id, _currentProcess.MainWindowTitle);
 
                     Filename = filename;
-                    _recordingStopwatch.Start();
-                    _timer.Start();
 
                 }
                 else
                 {
-                    throw new ApplicationException(string.Format("Could not start {0}.exe", _executable));
+                    throw new ApplicationException(string.Format("Could not start {0}.exe", startCommand.Path));
                 }
 
                 ExecuteEventCommands(CommandEvent.AfterStart, _replacmentParams);
@@ -306,38 +267,53 @@ namespace SageNetTuner
         private Process StartProcess(CommandEvent commandEvent, CommandElement command, string args)
         {
 
-            Logger.Info("{0} command running. [{1} {2}]", commandEvent, command.Path, args);
+            Logger.Info("StartProcess(): {0} command running. [{1} {2}]", commandEvent, command.Path, args);
 
-            var process = new Process
-            {
-                StartInfo =
-                {
-                    FileName = command.Path,
-                    Arguments = args,
-                    WorkingDirectory = "",
-                    CreateNoWindow = true,
-                    UseShellExecute = false,
-                    RedirectStandardError = true,
-                    RedirectStandardInput = true
-                }
-            };
-            process.ErrorDataReceived += DataReceivedHandler;
-            process.OutputDataReceived += DataReceivedHandler;
-            process.EnableRaisingEvents = true;
-            process.Exited += ProcessExitedHandler;
+            _currentCommand = command;
+
+            var process = new Process();
+            process.StartInfo.FileName = command.Path;
+            process.StartInfo.Arguments = args;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.WindowStyle=ProcessWindowStyle.Hidden;
+
             process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
 
-            Logger.Info("Run(): started new process {0}", _currentProcess.Id);
+            if (process != null)
+            {
+                Logger.Info("StartProcess(): started new process. ({1}) {0}, ", command.Path, process.Id);
+                process.ErrorDataReceived += DataReceivedHandler;
+                process.OutputDataReceived += DataReceivedHandler;
+                process.EnableRaisingEvents = true;
+                process.Exited += ProcessExitedHandler;
 
+                try
+                {
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+                }
+                catch (Exception e)
+                {
+                    Logger.Warn("StartProcess(): Exception trying to capture stdout/stderr", e);
+                    process.ErrorDataReceived -= DataReceivedHandler;
+                    process.OutputDataReceived -= DataReceivedHandler;
+                }
+
+            }
+            else
+            {
+                throw new Exception(string.Format("StartProcess(): Could not start {0}", command.Path));
+            }
             return process;
         }
 
         void ProcessExitedHandler(object sender, EventArgs e)
         {
             var proc = (Process)sender;
-            Logger.Info("Process {0} has exited with code {1}", proc.Id, proc.ExitCode);
+            Logger.Info("Process {0} has exited with code {1}.  Runtime={2}", proc.Id, proc.ExitCode, (proc.ExitTime - proc.StartTime));
 
         }
 
@@ -345,26 +321,24 @@ namespace SageNetTuner
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
-                StdOutLogger.Trace(e.Data);
+                _stdOutLogger.Trace(e.Data);
             }
         }
 
         public void Stop()
         {
 
-            //stop checking for executable running.
-            _timer.Stop();
-
+            var executableName = Path.GetFileNameWithoutExtension(_currentCommand.Path);
 
             if (_currentProcess == null)
             {
-                Logger.Debug("No currrent {0} process, nothing to Stop", _executable);
+                Logger.Debug("No currrent {0} process, nothing to Stop", executableName);
                 return;
             }
 
             if (_currentProcess.HasExited)
             {
-                Logger.Debug("Current {0} process has already exited", _executable);
+                Logger.Debug("Current {0} process has already exited", executableName);
                 Cleanup();
                 return;
             }
@@ -373,20 +347,28 @@ namespace SageNetTuner
 
             try
             {
-                Logger.Debug("Stopping {0}", _executable);
+                Logger.Debug("Stopping ({1}) {0}", executableName, _currentProcess.Id);
 
-                _recordingStopwatch.Stop();
+
+                if (_currentProcess.MainWindowHandle != IntPtr.Zero)
+                {
+                    _currentProcess.CloseMainWindow();
+                    _currentProcess.WaitForExit(5000);
+                }
+
+                if (!_currentProcess.HasExited)
+                    _currentProcess.Kill();
 
                 if (Logger.IsDebugEnabled)
                 {
                     Logger.Debug("Recording Stats: ");
                     Logger.Debug("  Filename: {0}", Filename);
-                    Logger.Debug("  Time: {0}", _recordingStopwatch.Elapsed);
+                    Logger.Debug("  Time: {0}", (_currentProcess.ExitTime - _currentProcess.StartTime));
                     Logger.Debug("  Size: {0:G}", GetFileSize());
                 }
 
                 Filename = "";
-                Logger.Info("{0} stopped", _executable);
+                Logger.Info("{0} stopped", executableName);
             }
             catch (Exception e)
             {

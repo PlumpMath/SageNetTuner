@@ -9,7 +9,7 @@
         static int Main(string[] args)
         {
 
-            var settings = Configuration.NetworkTunerServiceSection.Settings;
+            var settings = Configuration.SageNetTunerSection.Settings;
 
             return (int)HostFactory.Run(
                 config =>
