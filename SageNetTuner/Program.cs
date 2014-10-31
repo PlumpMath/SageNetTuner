@@ -1,15 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SageNetTuner
+﻿namespace SageNetTuner
 {
-    class Program
+    using System;
+
+    using Topshelf;
+
+    public class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
+
+            var settings = Configuration.NetworkTunerServiceSection.Settings;
+
+            return (int)HostFactory.Run(
+                config =>
+                {
+
+                    config.Service(hostsettings => new NetworkTunerService(settings), s =>
+                    {
+                        s.BeforeStartingService(_ => Console.WriteLine("BeforeStart"));
+                        s.BeforeStoppingService(_ => Console.WriteLine("BeforeStop"));
+                    });
+
+                    config.RunAsLocalSystem();
+                    config.SetDescription("SageTV Network Tuner Service");
+                    config.SetDisplayName("SageNetTuner");
+                    config.SetServiceName("SageNetTuner");
+
+                    config.UseNLog();
+
+                });
         }
+
     }
 }
