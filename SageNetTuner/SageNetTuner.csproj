@@ -37,6 +37,7 @@
       <HintPath>packages\NLog.3.1.0.0\lib\net45\NLog.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -48,6 +49,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\BaseConfigurationElementCollection.cs" />
+    <Compile Include="Configuration\ChannelProviderElement.cs" />
+    <Compile Include="Configuration\ChannelProviderElementCollection.cs" />
+    <Compile Include="Configuration\CommandElement.cs" />
+    <Compile Include="Configuration\CommandElementCollection.cs" />
+    <Compile Include="Configuration\DeviceElement.cs" />
+    <Compile Include="Configuration\DeviceElementCollection.cs" />
+    <Compile Include="Configuration\EncoderElement.cs" />
+    <Compile Include="Configuration\EncoderElementCollection.cs" />
+    <Compile Include="Configuration\IConfigurationElementCollectionElement.cs" />
+    <Compile Include="Configuration\NetworkTunerServiceSection.cs" />
+    <Compile Include="Configuration\TunerElement.cs" />
+    <Compile Include="Configuration\TunerElementCollection.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -60,6 +74,9 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Model\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
