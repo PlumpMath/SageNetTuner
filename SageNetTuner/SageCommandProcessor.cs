@@ -1,6 +1,7 @@
 namespace SageNetTuner
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -124,6 +125,9 @@ namespace SageNetTuner
 
                 switch (command)
                 {
+                    case "PROPERTIES":
+                        response = GetEncoderProperties();
+                        break;
                     case "STOP":
                         StopRecording();
                         break;
@@ -177,6 +181,52 @@ namespace SageNetTuner
             Logger.Info("Response:[{0}]", response);
 
             return response;
+        }
+
+        private string GetEncoderProperties()
+        {
+            var props = new List<string>();
+            props.Add(@"mmc/encoders/1234567/1/0/available_channels=");
+            props.Add(@"mmc/encoders/1234567/1/0/brightness=-1");
+            props.Add(@"mmc/encoders/1234567/1/0/broadcast_standard=");
+            props.Add(@"mmc/encoders/1234567/1/0/contrast=-1");
+            props.Add(@"mmc/encoders/1234567/1/0/device_name=");
+            props.Add(@"mmc/encoders/1234567/1/0/hue=-1");
+            props.Add(@"mmc/encoders/1234567/1/0/last_channel=");
+            props.Add(@"mmc/encoders/1234567/1/0/saturation=-1");
+            props.Add(@"mmc/encoders/1234567/1/0/sharpness=-1");
+            props.Add(@"mmc/encoders/1234567/1/0/tuning_mode=Cable");
+            props.Add(@"mmc/encoders/1234567/1/0/tuning_plugin=");
+            props.Add(@"mmc/encoders/1234567/1/0/tuning_plugin_port=0");
+            props.Add(@"mmc/encoders/1234567/1/0/video_crossbar_index=0");
+            props.Add(@"mmc/encoders/1234567/1/0/video_crossbar_type=1");
+            props.Add(@"mmc/encoders/1234567/audio_capture_device_name=");
+            props.Add(@"mmc/encoders/1234567/broadcast_standard=");
+            props.Add(@"mmc/encoders/1234567/capture_config=2050");
+            props.Add(@"mmc/encoders/1234567/default_device_quality=");
+            props.Add(@"mmc/encoders/1234567/delay_to_wait_after_tuning=0");
+            props.Add(@"mmc/encoders/1234567/encoder_merit=0");
+            props.Add(@"mmc/encoders/1234567/fast_network_encoder_switch=false");
+            props.Add(@"mmc/encoders/1234567/forced_video_storage_path_prefix=");
+            props.Add(@"mmc/encoders/1234567/last_cross_index=0");
+            props.Add(@"mmc/encoders/1234567/last_cross_type=1");
+            props.Add(@"mmc/encoders/1234567/live_audio_input=");
+            props.Add(@"mmc/encoders/1234567/multicast_host=");
+            props.Add(@"mmc/encoders/1234567/never_stop_encoding=false");
+            props.Add(@"mmc/encoders/1234567/video_capture_device_name=" + _tunerSettings.Name);
+            props.Add(@"mmc/encoders/1234567/video_capture_device_num=0");
+            props.Add(@"mmc/encoders/1234567/video_encoding_params=Great");
+
+            var response = new StringBuilder();
+            response.AppendLine(props.Count.ToString(CultureInfo.InvariantCulture));
+            foreach (var prop in props)
+            {
+                response.AppendLine(prop);
+            }
+            response.AppendLine("OK");
+
+            return response.ToString();
+
         }
 
         private string GetAvailableChannels(string commandArg)

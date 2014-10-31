@@ -32,6 +32,8 @@ namespace SageNetTuner
 
         private CommandElement _currentCommand;
 
+        private string _executableName;
+
         public string Filename { get; private set; }
 
 
@@ -89,6 +91,8 @@ namespace SageNetTuner
                 var msg = string.Format("Cannot find capture executable {0}", startCommand.Path);
                 throw new InvalidOperationException(msg);
             }
+
+            _executableName = Path.GetFileNameWithoutExtension(startCommand.Path);
 
             Logger.Debug("PathToExecutable={0}", startCommand.Path);
             Logger.Debug("CommandLineFormat={0}", startCommand.CommandLineFormat);
@@ -328,17 +332,16 @@ namespace SageNetTuner
         public void Stop()
         {
 
-            var executableName = Path.GetFileNameWithoutExtension(_currentCommand.Path);
 
             if (_currentProcess == null)
             {
-                Logger.Debug("No currrent {0} process, nothing to Stop", executableName);
+                Logger.Debug("No currrent {0} process, nothing to Stop", _executableName);
                 return;
             }
 
             if (_currentProcess.HasExited)
             {
-                Logger.Debug("Current {0} process has already exited", executableName);
+                Logger.Debug("Current {0} process has already exited", _executableName);
                 Cleanup();
                 return;
             }
@@ -347,7 +350,7 @@ namespace SageNetTuner
 
             try
             {
-                Logger.Debug("Stopping ({1}) {0}", executableName, _currentProcess.Id);
+                Logger.Debug("Stopping ({1}) {0}", _executableName, _currentProcess.Id);
 
 
                 if (_currentProcess.MainWindowHandle != IntPtr.Zero)
@@ -368,7 +371,7 @@ namespace SageNetTuner
                 }
 
                 Filename = "";
-                Logger.Info("{0} stopped", executableName);
+                Logger.Info("{0} stopped", _executableName);
             }
             catch (Exception e)
             {

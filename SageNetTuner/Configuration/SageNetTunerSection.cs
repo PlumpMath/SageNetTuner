@@ -13,6 +13,16 @@
             }
         }
 
+        [ConfigurationProperty("enableDiscovery", DefaultValue = false, IsRequired = false)]
+        public bool EnableDiscovery
+        {
+            get
+            {
+                return (bool)base["enableDiscovery"];
+            }
+        }
+
+
         [ConfigurationProperty("encoders")]
         public EncoderElementCollection Encoders
         {
