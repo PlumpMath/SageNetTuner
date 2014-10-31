@@ -1,11 +1,16 @@
 ﻿namespace SageNetTuner
 {
     using System;
+    using System.Reflection;
+
+    using NLog;
 
     using Topshelf;
 
     public class Program
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         static int Main(string[] args)
         {
 
@@ -17,8 +22,13 @@
 
                     config.Service(hostsettings => new NetworkTunerService(settings), s =>
                     {
-                        s.BeforeStartingService(_ => Console.WriteLine("BeforeStart"));
-                        s.BeforeStoppingService(_ => Console.WriteLine("BeforeStop"));
+                        s.BeforeStartingService(
+                            _ =>
+                                {
+                                    var assembly = Assembly.GetExecutingAssembly();
+                                    Logger.Info("SageNetTuner v{0}", assembly.GetName().Version);
+                                });
+                        s.AfterStoppingService(_ => Logger.Trace("SageNetTuner Stopped Succesfully"));
                     });
 
                     config.RunAsLocalSystem();

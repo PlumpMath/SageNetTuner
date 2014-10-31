@@ -70,7 +70,9 @@
     <Compile Include="Configuration\TunerElement.cs" />
     <Compile Include="Configuration\TunerElementCollection.cs" />
     <Compile Include="ExecutableProcessCaptureManager.cs" />
+    <Compile Include="Providers\HDHomeRunChannelProvider.cs" />
     <Compile Include="ICaptureManager.cs" />
+    <Compile Include="IChannelProvider.cs" />
     <Compile Include="Model\Channel.cs" />
     <Compile Include="Model\Lineup.cs" />
     <Compile Include="Model\StartCommand.cs" />

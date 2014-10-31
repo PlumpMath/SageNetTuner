@@ -28,15 +28,16 @@ namespace SageNetTuner
 
         private readonly ExecutableProcessCaptureManager _executableProcessCapture;
 
+        private IChannelProvider _channelProvider;
 
-        public SageCommandProcessor(TunerElement tunerSettings, DeviceElement deviceSettings, ExecutableProcessCaptureManager executableProcessCaptureManager)
+        public SageCommandProcessor(TunerElement tunerSettings, DeviceElement deviceSettings, ExecutableProcessCaptureManager executableProcessCaptureManager, IChannelProvider channelProvider)
         {
             _tunerSettings = tunerSettings;
             _deviceSettings = deviceSettings;
             Logger = LogManager.GetLogger(tunerSettings.Name);
 
-            this._executableProcessCapture = executableProcessCaptureManager;
-
+            _executableProcessCapture = executableProcessCaptureManager;
+            _channelProvider = channelProvider;
         }
 
         public string Name
@@ -316,28 +317,15 @@ namespace SageNetTuner
         public void Initialize()
         {
 
-            GetLineup();
-        }
+            _lineup = _channelProvider.GetLineup(_deviceSettings);
 
-        private void GetLineup()
-        {
-            try
-            {
+            if (_lineup==null)
+                Logger.Warn("Channel Lineup not retrieved.");
+            else if (_lineup.Channels.Count> 0)
+                Logger.Info("Retrieved Channels: Count=[{0}]", _lineup.Channels.Count);
 
-                var url = string.Format("http://{0}/lineup.xml", _deviceSettings.Address);
-                Logger.Debug("Getting Channel Lineup: {0}", url);
-                var client = new WebClient();
-                var channels = client.DownloadString(url);
 
-                var lineup = XmlHelper.FromXml<Lineup>(channels);
-                _lineup = lineup;
-
-                Logger.Debug("  Found Channels: {0}", _lineup.Channels.Count);
-            }
-            catch (Exception e)
-            {
-                this.Logger.Warn(string.Format("  Exception reading channels:  Name={0}", this._tunerSettings.Name), e);
-            }
+            
         }
 
         public void OnStopListening()
