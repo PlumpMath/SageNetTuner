@@ -340,7 +340,7 @@ namespace SageNetTuner
         void ProcessExitedHandler(object sender, EventArgs e)
         {
             var proc = (Process)sender;
-            Logger.Info("Process {0} has exited with code {1}.  Runtime={2}", proc.Id, proc.ExitCode, (proc.StartTime - proc.ExitTime));
+            Logger.Info("Process {0} has exited with code {1}", proc.Id, proc.ExitCode);
 
         }
 
