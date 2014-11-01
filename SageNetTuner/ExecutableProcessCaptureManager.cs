@@ -77,6 +77,7 @@ namespace SageNetTuner
                                        Event = CommandEvent.Start,
                                        Path = encoder.Path,
                                        CommandLineFormat = encoder.CommandLineFormat,
+                                       DelayAfterStart = TimeSpan.FromSeconds(0),
                                    };
                 encoder.Commands.Add(startCommand);
             }
@@ -102,7 +103,7 @@ namespace SageNetTuner
                 var msg = string.Format("Cannot find capture executable {0}", startCommand.Path);
                 throw new InvalidOperationException(msg);
             }
-            
+
             return startCommand;
         }
 
@@ -229,7 +230,25 @@ namespace SageNetTuner
                     throw new ApplicationException(string.Format("Could not start {0}.exe", startCommand.Path));
                 }
 
+
                 ExecuteEventCommands(CommandEvent.AfterStart, _replacmentParams);
+
+
+                //Allow the process to start creating the file
+
+                if (GetFileSize() <= 0)
+                {
+                    var stopwatch = new Stopwatch();
+                    stopwatch.Start();
+                    do
+                    {
+                        Thread.Sleep(500);
+                    }
+                    while (GetFileSize() <= 0 && stopwatch.Elapsed < _currentCommand.DelayAfterStart);
+                }
+
+                //if (_currentCommand.DelayAfterStart.TotalMilliseconds > 0)
+                //    Thread.Sleep((int) _currentCommand.DelayAfterStart.TotalMilliseconds);
             }
         }
 
@@ -286,7 +305,7 @@ namespace SageNetTuner
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.WindowStyle=ProcessWindowStyle.Hidden;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
             process.Start();
 
@@ -397,13 +416,13 @@ namespace SageNetTuner
 
             if (string.IsNullOrEmpty(Filename))
             {
-                Logger.Warn("  No Filename, cannot get file size.");
+                Logger.Warn("GetFileSize(): No Filename, cannot get file size.");
                 return 0;
             }
 
             if (!File.Exists(Filename))
             {
-                Logger.Warn("  File does not exist: {0}", Filename);
+                Logger.Warn("GetFileSize(): File does not exist: {0}", Filename);
                 return 0;
             }
 
@@ -417,7 +436,7 @@ namespace SageNetTuner
             }
             catch (Exception e)
             {
-                Logger.Warn(string.Format("Exception reading file size, {0}", Filename), e);
+                Logger.Warn(string.Format("GetFileSize(): Exception reading file size, {0}", Filename), e);
                 return 0;
             }
         }

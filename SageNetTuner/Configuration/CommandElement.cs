@@ -71,7 +71,21 @@
                 base["event"] = value;
             }
         }
-        
+
+
+        [ConfigurationProperty("delayAfterStart", IsRequired = false)]
+        public TimeSpan DelayAfterStart
+        {
+            get
+            {
+                return (TimeSpan)base["delayAfterStart"];
+            }
+            set
+            {
+                base["delayAfterStart"] = value;
+            }
+        }
+
 
         public object ElementKey { get; private set; }
     }
