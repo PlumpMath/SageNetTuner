@@ -227,7 +227,7 @@ namespace SageNetTuner
                 }
                 else
                 {
-                    throw new ApplicationException(string.Format("Could not start {0}.exe", startCommand.Path));
+                    throw new Exception(string.Format("Could not start {0}.exe", startCommand.Path));
                 }
 
 
@@ -245,10 +245,15 @@ namespace SageNetTuner
                         Thread.Sleep(500);
                     }
                     while (GetFileSize() <= 0 && stopwatch.Elapsed < _currentCommand.DelayAfterStart);
+
+                    if (GetFileSize() <= 0)
+                    {
+                        Logger.Error("Start(): DelayAfterStart timeout expired before recording started.  Timeout={0}, Elapsed={1}", _currentCommand.DelayAfterStart, stopwatch.Elapsed);
+                        Stop();
+                        throw new Exception("Recording process started, but recording did not start before timeout.");
+                    }
                 }
 
-                //if (_currentCommand.DelayAfterStart.TotalMilliseconds > 0)
-                //    Thread.Sleep((int) _currentCommand.DelayAfterStart.TotalMilliseconds);
             }
         }
 

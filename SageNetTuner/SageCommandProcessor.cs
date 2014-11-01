@@ -308,8 +308,8 @@ namespace SageNetTuner
             }
             catch (Exception ex)
             {
-                Logger.Error("Exception trying start recording", ex);
-                throw;
+                Logger.Error("StartRecording(): Exception trying start recording", ex);
+                return string.Format("ERROR {0}", ex.Message);
             }
         }
 
