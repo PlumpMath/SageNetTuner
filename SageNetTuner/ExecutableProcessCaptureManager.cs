@@ -431,7 +431,12 @@ namespace SageNetTuner
 
                 if (_recordingFileStream == null)
                     _recordingFileStream = File.Open(Filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
-                return _recordingFileStream.Length;
+
+                var length = _recordingFileStream.Length;
+
+                Logger.Trace("GetFileSize(): Length={0}", length);
+
+                return length;
 
             }
             catch (Exception e)

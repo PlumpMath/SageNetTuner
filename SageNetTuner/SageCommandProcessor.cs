@@ -134,11 +134,11 @@ namespace SageNetTuner
                         break;
                     case "START":
                     case "BUFFER":
-                        StartRecording(new StartCommand(commandArgs[1], commandArgs[3]));
+                        response = StartRecording(new StartCommand(commandArgs[1], commandArgs[3]));
                         break;
                     case "SWITCH":
                     case "BUFFER_SWITCH":
-                        StartRecording(new StartCommand(commandArgs[0], commandArgs[1]));
+                        response = StartRecording(new StartCommand(commandArgs[0], commandArgs[1]));
                         break;
                     case "GET_SIZE":
                         response = GetFileSize();
@@ -280,10 +280,10 @@ namespace SageNetTuner
             return 0;
         }
 
-        private void StartRecording(StartCommand command)
+        private string StartRecording(StartCommand command)
         {
 
-            Logger.Debug("Start Recording: {0}", command);
+            Logger.Debug("StartRecording(): {0}", command);
 
             try
             {
@@ -291,12 +291,19 @@ namespace SageNetTuner
                 var ch = (from x in _lineup.Channels where x.GuideNumber == command.Channel select x).FirstOrDefault();
                 if (ch != null)
                 {
-                    Logger.Debug("Found Requested Channel: GuideName={0}, GuideNumber={1}, URL={2}", ch.GuideName, ch.GuideNumber, ch.URL);
+                    Logger.Debug("StartRecording(): Found Requested Channel: GuideName={0}, GuideNumber={1}, URL={2}", ch.GuideName, ch.GuideNumber, ch.URL);
 
                     _executableProcessCapture.Start(ch, command.FileName);
+
+                    Logger.Trace("StartRecording(): Recording Started");
+
+                    return "OK";
                 }
-
-
+                else
+                {
+                    Logger.Warn("StartRecording(): Channel not found");
+                    return string.Format("ERROR Channel not found in device lineup. {0}", command.Channel);
+                }
 
             }
             catch (Exception ex)
