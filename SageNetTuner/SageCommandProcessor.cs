@@ -184,39 +184,39 @@ namespace SageNetTuner
             return response;
         }
 
-        private string GetEncoderProperties()
+        private string GetEncoderProperties(string encoderId, string port)
         {
             var props = new List<string>();
-            props.Add(@"mmc/encoders/1234567/1/0/available_channels=");
-            props.Add(@"mmc/encoders/1234567/1/0/brightness=-1");
-            props.Add(@"mmc/encoders/1234567/1/0/broadcast_standard=");
-            props.Add(@"mmc/encoders/1234567/1/0/contrast=-1");
-            props.Add(@"mmc/encoders/1234567/1/0/device_name=");
-            props.Add(@"mmc/encoders/1234567/1/0/hue=-1");
-            props.Add(@"mmc/encoders/1234567/1/0/last_channel=");
-            props.Add(@"mmc/encoders/1234567/1/0/saturation=-1");
-            props.Add(@"mmc/encoders/1234567/1/0/sharpness=-1");
-            props.Add(@"mmc/encoders/1234567/1/0/tuning_mode=Cable");
-            props.Add(@"mmc/encoders/1234567/1/0/tuning_plugin=");
-            props.Add(@"mmc/encoders/1234567/1/0/tuning_plugin_port=0");
-            props.Add(@"mmc/encoders/1234567/1/0/video_crossbar_index=0");
-            props.Add(@"mmc/encoders/1234567/1/0/video_crossbar_type=1");
-            props.Add(@"mmc/encoders/1234567/audio_capture_device_name=");
-            props.Add(@"mmc/encoders/1234567/broadcast_standard=");
-            props.Add(@"mmc/encoders/1234567/capture_config=2050");
-            props.Add(@"mmc/encoders/1234567/default_device_quality=");
-            props.Add(@"mmc/encoders/1234567/delay_to_wait_after_tuning=0");
-            props.Add(@"mmc/encoders/1234567/encoder_merit=0");
-            props.Add(@"mmc/encoders/1234567/fast_network_encoder_switch=false");
-            props.Add(@"mmc/encoders/1234567/forced_video_storage_path_prefix=");
-            props.Add(@"mmc/encoders/1234567/last_cross_index=0");
-            props.Add(@"mmc/encoders/1234567/last_cross_type=1");
-            props.Add(@"mmc/encoders/1234567/live_audio_input=");
-            props.Add(@"mmc/encoders/1234567/multicast_host=");
-            props.Add(@"mmc/encoders/1234567/never_stop_encoding=false");
-            props.Add(@"mmc/encoders/1234567/video_capture_device_name=" + _tunerSettings.Name);
-            props.Add(@"mmc/encoders/1234567/video_capture_device_num=0");
-            props.Add(@"mmc/encoders/1234567/video_encoding_params=Great");
+            props.Add(string.Format(@"mmc/encoders/{0}/1/0/available_channels=", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/1/0/brightness=-1", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/1/0/broadcast_standard=", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/1/0/contrast=-1", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/1/0/device_name=", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/1/0/hue=-1", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/1/0/last_channel=", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/1/0/saturation=-1", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/1/0/sharpness=-1", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/1/0/tuning_mode=Cable", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/1/0/tuning_plugin=", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/1/0/tuning_plugin_port=0", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/1/0/video_crossbar_index=0", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/1/0/video_crossbar_type=1", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/audio_capture_device_name=", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/broadcast_standard=", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/capture_config=2050", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/default_device_quality=", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/delay_to_wait_after_tuning=0", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/encoder_merit=0", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/fast_network_encoder_switch=false", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/forced_video_storage_path_prefix=", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/last_cross_index=0", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/last_cross_type=1", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/live_audio_input=", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/multicast_host=", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/never_stop_encoding=false", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/video_capture_device_name={1}", encoderId, _tunerSettings.Name));
+            props.Add(string.Format(@"mmc/encoders/{0}/video_capture_device_num=0", encoderId));
+            props.Add(string.Format(@"mmc/encoders/{0}/video_encoding_params=Great", encoderId));
 
             var response = new StringBuilder();
             response.AppendLine(props.Count.ToString(CultureInfo.InvariantCulture));

@@ -186,8 +186,6 @@ namespace SageNetTuner
 
             _stdOutLogger = LogManager.GetLogger(string.Format("stdout-{0}", Path.GetFileName(filename)));
 
-            //var args = string.Format("-i {0} -metadata comment=\"Tuner: {3}\" {1} \"{2}\"", url, this._commandLineFormat, filename, _tunerName);
-
             _replacmentParams = new object[10];
             _replacmentParams[0] = channel.URL;
             _replacmentParams[1] = filename;
@@ -244,28 +242,34 @@ namespace SageNetTuner
 
 
                 //Allow the process to start creating the file
-
-                if (GetFileSize() <= 0)
-                {
-                    var stopwatch = new Stopwatch();
-                    stopwatch.Start();
-                    do
-                    {
-                        Thread.Sleep(500);
-                    }
-                    while (GetFileSize() <= 0 && stopwatch.Elapsed < _currentCommand.DelayAfterStart);
-
-                    if (GetFileSize() <= 0)
-                    {
-                        Logger.Error("Start(): DelayAfterStart timeout expired before recording started.  Timeout={0}, Elapsed={1}", _currentCommand.DelayAfterStart, stopwatch.Elapsed);
-                        Stop();
-                        throw new Exception("Recording process started, but recording did not start before timeout.");
-                    }
-                }
+                WaitForRecordingToStart();
 
             }
         }
 
+        private void WaitForRecordingToStart()
+        {
+            if (GetFileSize() <= 0)
+            {
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+                do
+                {
+                    Thread.Sleep(500);
+                }
+                while (GetFileSize() <= 0 && stopwatch.Elapsed < _currentCommand.DelayAfterStart);
+
+                if (GetFileSize() <= 0)
+                {
+                    Logger.Error(
+                        "Start(): DelayAfterStart timeout expired before recording started.  Timeout={0}, Elapsed={1}",
+                        _currentCommand.DelayAfterStart,
+                        stopwatch.Elapsed);
+                    Stop();
+                    throw new Exception("Recording process started, but recording did not start before timeout.");
+                }
+            }
+        }
 
         private void ExecuteEventCommands(CommandEvent commandEvent, object[] replacmentParams)
         {
