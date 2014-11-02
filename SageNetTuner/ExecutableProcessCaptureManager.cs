@@ -216,13 +216,22 @@ namespace SageNetTuner
 
                 if (_currentProcess != null)
                 {
-                    Thread.Sleep(10);
-                    if (_currentProcess.MainWindowHandle != IntPtr.Zero)
-                        SetWindowText(_currentProcess.MainWindowHandle, string.Format("SageNetTuner: {0}", _tuner.Name));
-
-                    Logger.Debug("  {0} started: PID={1}, WindowTitle=[{2}]", _currentProcess.MainModule.FileName, _currentProcess.Id, _currentProcess.MainWindowTitle);
 
                     Filename = filename;
+
+                    try
+                    {
+                        Thread.Sleep(10);
+                        if (_currentProcess.MainWindowHandle != IntPtr.Zero)
+                            SetWindowText(_currentProcess.MainWindowHandle, string.Format("SageNetTuner: {0}", _tuner.Name));
+
+                        Logger.Debug("  {0} started: PID={1}, WindowTitle=[{2}]", _currentProcess.MainModule.FileName, _currentProcess.Id, _currentProcess.MainWindowTitle);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn("Start(): Ignoring exception while trying to set/get WindowTitle. [{0}]", ex.Message);
+                    }
+
 
                 }
                 else
