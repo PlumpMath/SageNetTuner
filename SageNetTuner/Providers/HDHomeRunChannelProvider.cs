@@ -5,6 +5,7 @@
     using NLog;
 
     using SageNetTuner.Configuration;
+    using SageNetTuner.Contracts;
     using SageNetTuner.Model;
 
     public class HDHomeRunChannelProvider : IChannelProvider

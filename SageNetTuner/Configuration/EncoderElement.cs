@@ -54,8 +54,11 @@
             }
         }
 
+        [ConfigurationProperty("id", IsRequired = true)]
+        public string Id { get; set; }
        
 
         public object ElementKey { get; private set; }
+
     }
 }

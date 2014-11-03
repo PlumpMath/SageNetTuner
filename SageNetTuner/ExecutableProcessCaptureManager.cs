@@ -12,6 +12,7 @@ namespace SageNetTuner
     using NLog;
 
     using SageNetTuner.Configuration;
+    using SageNetTuner.Contracts;
     using SageNetTuner.Model;
 
     public class ExecutableProcessCaptureManager : ICaptureManager

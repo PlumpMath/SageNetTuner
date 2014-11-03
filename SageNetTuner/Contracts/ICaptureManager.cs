@@ -1,4 +1,4 @@
-namespace SageNetTuner
+namespace SageNetTuner.Contracts
 {
     using SageNetTuner.Model;
 

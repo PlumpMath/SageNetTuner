@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace SageNetTuner
+﻿namespace SageNetTuner.Contracts
 {
     using SageNetTuner.Configuration;
     using SageNetTuner.Model;
