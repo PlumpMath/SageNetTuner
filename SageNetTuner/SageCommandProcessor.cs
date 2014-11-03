@@ -19,6 +19,8 @@ namespace SageNetTuner
     using SageNetTuner.Model;
     using SageNetTuner.Network;
 
+    using Tamarack.Pipeline;
+
     public class SageCommandProcessor
     {
 
@@ -31,7 +33,7 @@ namespace SageNetTuner
 
         private readonly ExecutableProcessCaptureManager _executableProcessCapture;
 
-        private IChannelProvider _channelProvider;
+        private readonly IChannelProvider _channelProvider;
 
 
         public SageCommandProcessor(TunerElement tunerSettings, DeviceElement deviceSettings, ExecutableProcessCaptureManager executableProcessCaptureManager, IChannelProvider channelProvider)
@@ -111,6 +113,10 @@ namespace SageNetTuner
         private string HandleRequest(string request)
         {
 
+            System.IServiceProvider serviceProvder;
+
+            
+
             Logger.Info("HandleRequest: [{0}]", request);
             try
             {
@@ -125,9 +131,25 @@ namespace SageNetTuner
                                           }
                                   };
 
-                var response = new CommandPipeline(context, _executableProcessCapture).Execute();
+                var pipeline = new Pipeline<RequestContext, string>()
+                        .Add(new ParseRequestFilter(Logger))
+                        .Add(new NoopFilter(Logger))
+                        .Add(new GetFileSizeFilter(Logger))
+                        .Add(new StartFilter(_executableProcessCapture, Logger))
+                        .Add(new StopFilter(_executableProcessCapture, Logger))
+                        .Add(new VersionFilter(Logger))
+                        .Add(new GetSizeFilter(_executableProcessCapture, Logger))
+                        .Finally(
+                            c =>
+                            {
+                                Logger.Warn("Unknown Command: {0}", c.Request);
+                                return "ERROR Unknown Command";
+                            });
 
-                return response;
+
+                return pipeline.Execute(context);
+
+
             }
             catch (Exception ex)
             {
@@ -154,12 +176,7 @@ namespace SageNetTuner
 
         public void OnStopListening()
         {
-
             _executableProcessCapture.Stop();
-
-            //var x = new StopFilter(_executableProcessCapture, Logger);
-            //x.Execute(new RequestContext(CommandName.Stop, new string[0]), null);
-
         }
     }
 }
