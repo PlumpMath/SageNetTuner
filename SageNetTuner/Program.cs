@@ -63,6 +63,7 @@
 
             builder.RegisterInstance(Configuration.SageNetTunerSection.Settings);
 
+            builder.RegisterType<NetworkTunerService>();
             builder.RegisterType<Providers.HDHomeRunChannelProvider>().As<IChannelProvider>();
             builder.RegisterType<ExecutableProcessCaptureManager>().As<ICaptureManager>();
             builder.RegisterType<RequestParser>().As<IRequestParser>();

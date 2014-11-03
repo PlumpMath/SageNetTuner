@@ -11,6 +11,8 @@ namespace SageNetTuner
     using System.Text;
     using System.Timers;
 
+    using Autofac;
+
     using NLog;
 
     using SageNetTuner.Configuration;
@@ -25,19 +27,23 @@ namespace SageNetTuner
     {
 
         private readonly Logger Logger;
+
+        private readonly ILifetimeScope _lifetimeScope;
+
         private readonly TunerElement _tunerSettings;
 
         private readonly DeviceElement _deviceSettings;
 
         private Lineup _lineup;
 
-        private readonly ExecutableProcessCaptureManager _executableProcessCapture;
+        private readonly ICaptureManager _executableProcessCapture;
 
         private readonly IChannelProvider _channelProvider;
 
 
-        public SageCommandProcessor(TunerElement tunerSettings, DeviceElement deviceSettings, ExecutableProcessCaptureManager executableProcessCaptureManager, IChannelProvider channelProvider)
+        public SageCommandProcessor(ILifetimeScope lifetimeScope, TunerElement tunerSettings, DeviceElement deviceSettings, ICaptureManager executableProcessCaptureManager, IChannelProvider channelProvider)
         {
+            _lifetimeScope = lifetimeScope;
             _tunerSettings = tunerSettings;
             _deviceSettings = deviceSettings;
             Logger = LogManager.GetLogger(tunerSettings.Name);
@@ -113,48 +119,57 @@ namespace SageNetTuner
         private string HandleRequest(string request)
         {
 
-            System.IServiceProvider serviceProvder;
-
-            
-
-            Logger.Info("HandleRequest: [{0}]", request);
-            try
+            using (var innerScope = _lifetimeScope.BeginLifetimeScope(x => { }))
             {
+
 
                 var context = new RequestContext(request)
-                                  {
-                                      Settings =
-                                          {
-                                              Device = _deviceSettings,
-                                              Tuner = _tunerSettings,
-                                              Lineup = _lineup,
-                                          }
-                                  };
+                {
+                    Settings =
+                    {
+                        Device = _deviceSettings,
+                        Tuner = _tunerSettings,
+                        Lineup = _lineup,
+                    }
+                };
 
-                var pipeline = new Pipeline<RequestContext, string>()
-                        .Add(new ParseRequestFilter(Logger))
-                        .Add(new NoopFilter(Logger))
-                        .Add(new GetFileSizeFilter(Logger))
-                        .Add(new StartFilter(_executableProcessCapture, Logger))
-                        .Add(new StopFilter(_executableProcessCapture, Logger))
-                        .Add(new VersionFilter(Logger))
-                        .Add(new GetSizeFilter(_executableProcessCapture, Logger))
-                        .Finally(
-                            c =>
-                            {
-                                Logger.Warn("Unknown Command: {0}", c.Request);
-                                return "ERROR Unknown Command";
-                            });
+                //Update the innerscope to provide the correct instances to the Pipeline
+                var innerScopeBuilder = new ContainerBuilder();
+                innerScopeBuilder.RegisterInstance(Logger);
+                innerScopeBuilder.RegisterInstance(context);
+                innerScopeBuilder.Update(innerScope.ComponentRegistry);
+
+                Logger.Info("HandleRequest: [{0}]", request);
+                try
+                {
 
 
-                return pipeline.Execute(context);
+                    var pipeline = new Pipeline<RequestContext, string>((IServiceProvider)innerScope)
+                            .Add<ParseRequestFilter>()
+                            .Add<NoopFilter>()
+                            .Add<GetFileSizeFilter>()
+                            .Add<StartFilter>()
+                            .Add<StopFilter>()
+                            .Add<VersionFilter>()
+                            .Add<GetSizeFilter>()
+                            .Finally(
+                                c =>
+                                {
+                                    Logger.Warn("Unknown Command: {0}", c.Request);
+                                    return "ERROR Unknown Command";
+                                });
 
 
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Exception handling request", ex);
-                return "ERROR " + ex.Message;
+                    return pipeline.Execute(context);
+
+
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("Exception handling request", ex);
+                    return "ERROR " + ex.Message;
+                }
+
             }
 
         }
@@ -165,13 +180,13 @@ namespace SageNetTuner
 
             _lineup = _channelProvider.GetLineup(_deviceSettings);
 
-            if (_lineup==null)
+            if (_lineup == null)
                 Logger.Warn("Channel Lineup not retrieved.");
-            else if (_lineup.Channels.Count> 0)
+            else if (_lineup.Channels.Count > 0)
                 Logger.Info("Retrieved Channels: Count=[{0}]", _lineup.Channels.Count);
 
 
-            
+
         }
 
         public void OnStopListening()
