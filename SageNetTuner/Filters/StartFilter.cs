@@ -28,6 +28,8 @@
 
         protected override string OnExecute(RequestContext context)
         {
+            Logger.Debug("StartFilter.OnExecute()");
+
             return StartRecording(context);
         }
 

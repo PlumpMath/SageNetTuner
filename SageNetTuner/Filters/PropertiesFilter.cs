@@ -24,6 +24,9 @@
 
         protected override string OnExecute(RequestContext context)
         {
+
+            Logger.Debug("PropertiesFilter.OnExecute()");
+
             var props = new List<string>();
             props.Add(string.Format(@"mmc/encoders/{0}/1/0/available_channels=", context.Settings.Tuner.Id));
             props.Add(string.Format(@"mmc/encoders/{0}/1/0/brightness=-1", context.Settings.Tuner.Id));

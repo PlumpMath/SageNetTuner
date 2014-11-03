@@ -41,16 +41,15 @@ namespace SageNetTuner
         private readonly IChannelProvider _channelProvider;
 
 
-        public SageCommandProcessor(ILifetimeScope lifetimeScope, TunerElement tunerSettings, DeviceElement deviceSettings, ICaptureManager executableProcessCaptureManager, IChannelProvider channelProvider)
+        public SageCommandProcessor(ILifetimeScope lifetimeScope, TunerElement tunerSettings, DeviceElement deviceSettings, ICaptureManager executableProcessCaptureManager, IChannelProvider channelProvider, Logger logger)
         {
             _lifetimeScope = lifetimeScope;
             _tunerSettings = tunerSettings;
             _deviceSettings = deviceSettings;
-            Logger = LogManager.GetLogger(tunerSettings.Name);
 
             _executableProcessCapture = executableProcessCaptureManager;
             _channelProvider = channelProvider;
-
+            Logger = logger;
         }
 
         public string Name
@@ -119,25 +118,24 @@ namespace SageNetTuner
         private string HandleRequest(string request)
         {
 
-            using (var innerScope = _lifetimeScope.BeginLifetimeScope("request"))
+            var context = new RequestContext(request)
             {
-
-
-                var context = new RequestContext(request)
+                Settings =
                 {
-                    Settings =
-                    {
-                        Device = _deviceSettings,
-                        Tuner = _tunerSettings,
-                        Lineup = _lineup,
-                    }
-                };
+                    Device = _deviceSettings,
+                    Tuner = _tunerSettings,
+                    Lineup = _lineup,
+                }
+            };
 
-                //Update the innerscope to provide the correct instances to the Pipeline
-                var innerScopeBuilder = new ContainerBuilder();
-                innerScopeBuilder.RegisterInstance(Logger);
-                innerScopeBuilder.RegisterInstance(context);
-                innerScopeBuilder.Update(innerScope.ComponentRegistry);
+
+            using (var innerScope = _lifetimeScope.BeginLifetimeScope("request", (builder)=>
+            {
+                builder.RegisterInstance(Logger);
+                builder.RegisterInstance(context);
+                
+            }))
+            {
 
                 Logger.Info("HandleRequest: [{0}]", request);
                 try
@@ -188,7 +186,7 @@ namespace SageNetTuner
 
         }
 
-        public void OnStopListening()
+        public void StopListening()
         {
             _executableProcessCapture.Stop();
         }

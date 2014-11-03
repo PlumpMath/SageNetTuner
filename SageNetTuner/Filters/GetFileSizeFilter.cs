@@ -26,6 +26,8 @@ namespace SageNetTuner.Filters
 
         protected override string OnExecute(RequestContext context)
         {
+            Logger.Debug("GetFileSizeFilter.OnExecute()");
+
             return GetFileSize(context.CommandArgs[0]).ToString(CultureInfo.InvariantCulture);
         }
 

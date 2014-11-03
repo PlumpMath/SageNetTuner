@@ -22,6 +22,8 @@
 
         protected override string OnExecute(RequestContext context)
         {
+            Logger.Debug("VersionFilter.OnExecute()");
+
             return "2.1";
         }
     }

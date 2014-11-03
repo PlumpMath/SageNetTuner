@@ -93,7 +93,6 @@
     <Compile Include="Filters\PropertiesFilter.cs" />
     <Compile Include="Model\CommandName.cs" />
     <Compile Include="Model\RequestContext.cs" />
-    <Compile Include="RequestParser.cs" />
     <Compile Include="Providers\HDHomeRunChannelProvider.cs" />
     <Compile Include="Contracts\ICaptureManager.cs" />
     <Compile Include="Contracts\IChannelProvider.cs" />

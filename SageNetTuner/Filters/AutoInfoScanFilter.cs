@@ -28,6 +28,8 @@
 
         protected override string OnExecute(RequestContext context)
         {
+            Logger.Debug("AutoInfoScanFilter.OnExecute()");
+
             var op = "";
             if (context.CommandArgs.Length > 0)
                 op = context.CommandArgs[0];

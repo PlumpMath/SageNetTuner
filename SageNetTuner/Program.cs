@@ -69,7 +69,6 @@
             builder.RegisterType<NetworkTunerService>();
             builder.RegisterType<Providers.HDHomeRunChannelProvider>().As<IChannelProvider>();
             builder.RegisterType<ExecutableProcessCaptureManager>().As<ICaptureManager>().InstancePerMatchingLifetimeScope("tuner");
-            builder.RegisterType<RequestParser>().As<IRequestParser>();
             builder.RegisterType<SageCommandProcessor>();
 
             var asm = Assembly.GetExecutingAssembly();

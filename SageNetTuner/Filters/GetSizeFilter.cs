@@ -25,6 +25,8 @@ namespace SageNetTuner.Filters
 
         protected override string OnExecute(RequestContext context)
         {
+            Logger.Debug("GetSizeFilter.OnExecute()");
+
             return _executableProcessCapture.GetFileSize().ToString(CultureInfo.InvariantCulture);
         }
     }

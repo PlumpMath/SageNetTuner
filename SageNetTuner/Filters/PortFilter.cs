@@ -25,6 +25,8 @@
 
         protected override string OnExecute(RequestContext context)
         {
+            Logger.Debug("PortFilter.OnExecute()");
+
             return context.Settings.Tuner.ListenerPort.ToString(CultureInfo.InvariantCulture); ;
         }
     }

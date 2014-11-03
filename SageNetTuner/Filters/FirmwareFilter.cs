@@ -30,6 +30,8 @@ namespace SageNetTuner.Filters
 
         protected override string OnExecute(RequestContext context)
         {
+            Logger.Debug("FirmwareFilter.OnExecute()");
+
             return Assembly.GetEntryAssembly().GetName().Version.ToString();
         }
     }

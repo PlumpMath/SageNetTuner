@@ -30,8 +30,7 @@
         protected override string OnExecute(RequestContext context)
         {
 
-
-            Logger.Debug("StopRecording:");
+            Logger.Debug("StopFilter.OnExecute()");
             _executableProcessCapture.Stop();
 
             return "OK";
