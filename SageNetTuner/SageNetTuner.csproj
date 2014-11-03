@@ -65,7 +65,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandPipeline.cs" />
     <Compile Include="Configuration\BaseConfigurationElementCollection.cs" />
     <Compile Include="Configuration\ChannelProviderElement.cs" />
     <Compile Include="Configuration\ChannelProviderElementCollection.cs" />
@@ -85,6 +84,7 @@
     <Compile Include="Filters\BaseFilter.cs" />
     <Compile Include="Filters\FirmwareFilter.cs" />
     <Compile Include="Filters\GetSizeFilter.cs" />
+    <Compile Include="Filters\LoggingFilter.cs" />
     <Compile Include="Filters\NoopFilter.cs" />
     <Compile Include="Contracts\IRequestParser.cs" />
     <Compile Include="Filters\GetFileSizeFilter.cs" />

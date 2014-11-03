@@ -141,7 +141,9 @@ namespace SageNetTuner
                 try
                 {
 
+
                     var pipeline = new Pipeline<RequestContext, string>((IServiceProvider)innerScope)
+                            .Add<LoggingFilter>()
                             .Add<ParseRequestFilter>()
                             .Add<NoopFilter>()
                             .Add<GetFileSizeFilter>()
@@ -170,6 +172,8 @@ namespace SageNetTuner
             }
 
         }
+
+
 
 
         public void Initialize()
