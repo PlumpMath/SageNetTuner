@@ -11,6 +11,8 @@
         public VersionFilter(Logger logger)
             : base(logger)
         {
+            logger.Trace("VersionFilter.ctor()");
+
         }
 
         protected override bool CanExecute(RequestContext context)

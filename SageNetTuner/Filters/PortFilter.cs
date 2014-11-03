@@ -14,6 +14,8 @@
         public PortFilter(Logger logger)
             : base(logger)
         {
+            logger.Trace("PortFilter.ctor()");
+
         }
 
         protected override bool CanExecute(RequestContext context)

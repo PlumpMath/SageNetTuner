@@ -18,6 +18,8 @@ namespace SageNetTuner.Filters
         public FirmwareFilter(Logger logger)
             : base(logger)
         {
+            logger.Trace("FirmwareFilter.ctor()");
+
         }
 
         protected override bool CanExecute(RequestContext context)

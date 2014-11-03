@@ -4,6 +4,7 @@
 
     using NLog;
 
+    using SageNetTuner.Contracts;
     using SageNetTuner.Model;
 
     using Tamarack.Pipeline;
@@ -11,11 +12,13 @@
     public class StopFilter : BaseFilter
     {
 
-        private readonly ExecutableProcessCaptureManager _executableProcessCapture;
-        
-        public StopFilter(ExecutableProcessCaptureManager executableProcessCaptureManager, Logger logger)
+        private readonly ICaptureManager _executableProcessCapture;
+
+        public StopFilter(ICaptureManager executableProcessCaptureManager, Logger logger)
             : base(logger)
         {
+            logger.Trace("StopFilter.ctor()");
+
             _executableProcessCapture = executableProcessCaptureManager;
         }
 

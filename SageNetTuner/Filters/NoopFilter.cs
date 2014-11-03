@@ -14,6 +14,8 @@ namespace SageNetTuner.Filters
         public NoopFilter(Logger logger)
             : base(logger)
         {
+            logger.Trace("NoopFilter.ctor()");
+
         }
 
         protected override bool CanExecute(RequestContext context)

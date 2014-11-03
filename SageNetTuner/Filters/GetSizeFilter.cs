@@ -4,15 +4,17 @@ namespace SageNetTuner.Filters
 
     using NLog;
 
+    using SageNetTuner.Contracts;
     using SageNetTuner.Model;
 
     public class GetSizeFilter : BaseFilter
     {
-        private readonly ExecutableProcessCaptureManager _executableProcessCapture;
+        private readonly ICaptureManager _executableProcessCapture;
 
-        public GetSizeFilter(ExecutableProcessCaptureManager executableProcessCapture, Logger logger)
+        public GetSizeFilter(ICaptureManager executableProcessCapture, Logger logger)
             : base(logger)
         {
+            logger.Trace("GetSizeFilter.ctor()");
             _executableProcessCapture = executableProcessCapture;
         }
 

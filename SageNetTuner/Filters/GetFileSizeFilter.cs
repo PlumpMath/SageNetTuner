@@ -15,6 +15,8 @@ namespace SageNetTuner.Filters
         public GetFileSizeFilter(Logger logger)
             : base(logger)
         {
+            logger.Trace("GetFileSizeFilter.ctor()");
+
         }
 
         protected override bool CanExecute(RequestContext context)

@@ -13,6 +13,8 @@
         public PropertiesFilter(Logger logger)
             : base(logger)
         {
+            logger.Trace("PropertiesFilter.ctor()");
+
         }
 
         protected override bool CanExecute(RequestContext context)

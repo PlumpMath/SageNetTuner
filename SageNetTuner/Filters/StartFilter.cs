@@ -5,16 +5,19 @@
 
     using NLog;
 
+    using SageNetTuner.Contracts;
     using SageNetTuner.Model;
 
     public class StartFilter :  BaseFilter
     {
-        private readonly ExecutableProcessCaptureManager _executableProcessCapture;
+        private readonly ICaptureManager _executableProcessCapture;
 
 
-        public StartFilter(ExecutableProcessCaptureManager executableProcessCaptureManager, Logger logger)
+        public StartFilter(ICaptureManager executableProcessCaptureManager, Logger logger)
             : base(logger)
         {
+            logger.Trace("StartFilter.ctor()");
+
             _executableProcessCapture = executableProcessCaptureManager;
         }
 

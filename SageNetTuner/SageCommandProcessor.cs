@@ -119,7 +119,7 @@ namespace SageNetTuner
         private string HandleRequest(string request)
         {
 
-            using (var innerScope = _lifetimeScope.BeginLifetimeScope(x => { }))
+            using (var innerScope = _lifetimeScope.BeginLifetimeScope("request"))
             {
 
 
@@ -142,7 +142,6 @@ namespace SageNetTuner
                 Logger.Info("HandleRequest: [{0}]", request);
                 try
                 {
-
 
                     var pipeline = new Pipeline<RequestContext, string>((IServiceProvider)innerScope)
                             .Add<ParseRequestFilter>()

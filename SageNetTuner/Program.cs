@@ -2,6 +2,7 @@
 {
     using System;
     using System.Reflection;
+    using System.Reflection.Emit;
 
     using Autofac;
 
@@ -9,6 +10,8 @@
 
     using SageNetTuner.Contracts;
     using SageNetTuner.Model;
+
+    using Tamarack.Pipeline;
 
     using Topshelf;
     using Topshelf.Autofac;
@@ -65,9 +68,15 @@
 
             builder.RegisterType<NetworkTunerService>();
             builder.RegisterType<Providers.HDHomeRunChannelProvider>().As<IChannelProvider>();
-            builder.RegisterType<ExecutableProcessCaptureManager>().As<ICaptureManager>();
+            builder.RegisterType<ExecutableProcessCaptureManager>().As<ICaptureManager>().InstancePerMatchingLifetimeScope("tuner");
             builder.RegisterType<RequestParser>().As<IRequestParser>();
             builder.RegisterType<SageCommandProcessor>();
+
+            var asm = Assembly.GetExecutingAssembly();
+            builder.RegisterAssemblyTypes(asm)
+                .Where(t => t.IsClosedTypeOf(typeof(IFilter<,>)))
+                .AsSelf()
+                .AsImplementedInterfaces();
 
             return builder.Build();
         }

@@ -16,6 +16,8 @@
         public AutoInfoScanFilter(Logger logger)
             : base(logger)
         {
+            logger.Trace("AutoInfoScanFilter.ctor()");
+
         }
 
         protected override bool CanExecute(RequestContext context)
