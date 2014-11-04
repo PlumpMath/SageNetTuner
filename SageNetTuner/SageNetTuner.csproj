@@ -91,7 +91,7 @@
     <Compile Include="Filters\ParseRequestFilter.cs" />
     <Compile Include="Filters\PortFilter.cs" />
     <Compile Include="Filters\PropertiesFilter.cs" />
-    <Compile Include="Model\CommandName.cs" />
+    <Compile Include="Model\RequestCommand.cs" />
     <Compile Include="Model\RequestContext.cs" />
     <Compile Include="Providers\HDHomeRunChannelProvider.cs" />
     <Compile Include="Contracts\ICaptureManager.cs" />

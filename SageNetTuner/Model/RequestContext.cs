@@ -15,19 +15,22 @@ namespace SageNetTuner.Model
         }
 
 
-        public RequestContext(CommandName command, string[] args)
+        public RequestContext(RequestCommand requestCommand, string[] args)
         {
-            Command = command;
+            RequestCommand = requestCommand;
             CommandArgs = args;
             Settings = new RequestSettings();
         }
 
 
-        public CommandName Command { get; set; }
+        public RequestCommand RequestCommand { get; set; }
+
+        public string RequestCommandName { get; set; }
 
         public string[] CommandArgs { get; set; }
 
         public string Request { get; set; }
+        
         public string Response { get; set; }
 
         public RequestSettings Settings { get; private set; }

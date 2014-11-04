@@ -24,7 +24,7 @@
 
         protected override bool CanExecute(RequestContext context)
         {
-            return (context.Command == CommandName.Stop);
+            return (context.RequestCommand == RequestCommand.Stop);
         }
 
         protected override string OnExecute(RequestContext context)

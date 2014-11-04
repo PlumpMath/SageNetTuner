@@ -1,6 +1,6 @@
 ﻿namespace SageNetTuner.Model
 {
-    public enum CommandName
+    public enum RequestCommand
     {
 
         Unknown=-1,

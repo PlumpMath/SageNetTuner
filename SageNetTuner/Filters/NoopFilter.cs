@@ -20,7 +20,7 @@ namespace SageNetTuner.Filters
 
         protected override bool CanExecute(RequestContext context)
         {
-            return (context.Command == CommandName.Noop);
+            return (context.RequestCommand == RequestCommand.Noop);
         }
 
         protected override string OnExecute(RequestContext context)

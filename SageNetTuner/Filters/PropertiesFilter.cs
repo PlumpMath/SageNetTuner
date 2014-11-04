@@ -19,7 +19,7 @@
 
         protected override bool CanExecute(RequestContext context)
         {
-            return (context.Command==CommandName.Properties);
+            return (context.RequestCommand==RequestCommand.Properties);
         }
 
         protected override string OnExecute(RequestContext context)

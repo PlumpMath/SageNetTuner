@@ -15,7 +15,7 @@ namespace SageNetTuner.Filters
     {
         private readonly Logger _logger;
 
-        private readonly Dictionary<string, CommandName> _commands;
+        private readonly Dictionary<string, RequestCommand> _commands;
 
         public ParseRequestFilter(Logger logger)
         {
@@ -24,19 +24,19 @@ namespace SageNetTuner.Filters
             _logger = logger;
 
 
-            _commands = new Dictionary<string, CommandName>
+            _commands = new Dictionary<string, RequestCommand>
                             {
-                                { "NOOP", CommandName.Noop },
-                                { "START", CommandName.Start },
-                                { "BUFFER", CommandName.Start },
-                                { "BUFFER_SWITCH", CommandName.Start },
-                                { "STOP", CommandName.Stop},
-                                { "GET_FILE_SIZE", CommandName.GetFileSize },
-                                { "VERSION", CommandName.Version },
-                                { "AUTOINFOSCAN", CommandName.AutoInfoScan },
-                                { "PORT", CommandName.Port },
-                                { "GET_SIZE", CommandName.GetSize },
-                                { "FIRMWARD", CommandName.Firmware }
+                                { "NOOP", RequestCommand.Noop },
+                                { "START", RequestCommand.Start },
+                                { "BUFFER", RequestCommand.Start },
+                                { "BUFFER_SWITCH", RequestCommand.Start },
+                                { "STOP", RequestCommand.Stop},
+                                { "GET_FILE_SIZE", RequestCommand.GetFileSize },
+                                { "VERSION", RequestCommand.Version },
+                                { "AUTOINFOSCAN", RequestCommand.AutoInfoScan },
+                                { "PORT", RequestCommand.Port },
+                                { "GET_SIZE", RequestCommand.GetSize },
+                                { "FIRMWARD", RequestCommand.Firmware }
                             };
 
         }
@@ -53,6 +53,7 @@ namespace SageNetTuner.Filters
 
             var commandName = context.Request.Split(new[] { ' ' }, (StringSplitOptions)StringSplitOptions.RemoveEmptyEntries)[0];
 
+
             var commandArgs = context.Request
                 .Replace(commandName, "")
                 .Trim()
@@ -68,15 +69,16 @@ namespace SageNetTuner.Filters
                 }
             }
 
+            context.RequestCommandName = commandName;
 
-            CommandName command;
+            RequestCommand requestCommand;
             if (_commands.ContainsKey(commandName))
-                command = _commands[commandName];
+                requestCommand = _commands[commandName];
             else
-                command = CommandName.Unknown;
+                requestCommand = RequestCommand.Unknown;
 
 
-            context.Command = command;
+            context.RequestCommand = requestCommand;
             context.CommandArgs = commandArgs;
 
             return executeNext(context);

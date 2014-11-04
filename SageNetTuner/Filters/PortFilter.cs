@@ -20,7 +20,7 @@
 
         protected override bool CanExecute(RequestContext context)
         {
-            return (context.Command == CommandName.Port);
+            return (context.RequestCommand == RequestCommand.Port);
         }
 
         protected override string OnExecute(RequestContext context)

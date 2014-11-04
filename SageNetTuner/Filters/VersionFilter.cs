@@ -17,7 +17,7 @@
 
         protected override bool CanExecute(RequestContext context)
         {
-            return (context.Command == CommandName.Version);
+            return (context.RequestCommand == RequestCommand.Version);
         }
 
         protected override string OnExecute(RequestContext context)

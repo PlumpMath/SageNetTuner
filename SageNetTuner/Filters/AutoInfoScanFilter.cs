@@ -22,7 +22,7 @@
 
         protected override bool CanExecute(RequestContext context)
         {
-            return (context.Command == CommandName.AutoInfoScan);
+            return (context.RequestCommand == RequestCommand.AutoInfoScan);
         }
 
 

@@ -24,7 +24,7 @@ namespace SageNetTuner.Filters
 
         protected override bool CanExecute(RequestContext context)
         {
-            return (context.Command == CommandName.Firmware);
+            return (context.RequestCommand == RequestCommand.Firmware);
         }
 
 

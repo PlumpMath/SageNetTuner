@@ -20,7 +20,7 @@ namespace SageNetTuner.Filters
 
         protected override bool CanExecute(RequestContext context)
         {
-            return (context.Command == CommandName.GetSize);
+            return (context.RequestCommand == RequestCommand.GetSize);
         }
 
         protected override string OnExecute(RequestContext context)

@@ -23,7 +23,7 @@
 
         protected override bool CanExecute(RequestContext context)
         {
-            return (context.Command == CommandName.Start);
+            return (context.RequestCommand == RequestCommand.Start);
         }
 
         protected override string OnExecute(RequestContext context)
