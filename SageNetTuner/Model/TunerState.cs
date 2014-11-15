@@ -33,7 +33,7 @@ namespace SageNetTuner.Model
             Filename = "";
             Channel = new Channel();
 
-
+             
         }
 
         public override string ToString()
