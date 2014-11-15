@@ -23,7 +23,7 @@ namespace SageNetTuner.Filters
 
             _logger = logger;
 
-
+            //Build command mapping dictionary
             _commands = new Dictionary<string, RequestCommand>
                             {
                                 { "NOOP", RequestCommand.Noop },

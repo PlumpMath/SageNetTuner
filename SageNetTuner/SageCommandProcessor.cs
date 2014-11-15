@@ -135,7 +135,7 @@ namespace SageNetTuner
                 },
             };
 
-
+            // Create a inner lifetimescope (i.e. container) for this request
             using (var innerScope = _lifetimeScope.BeginLifetimeScope("request", (builder)=>
             {
                 builder.RegisterInstance(Logger);
@@ -150,7 +150,7 @@ namespace SageNetTuner
 
 
                     var pipeline = new Pipeline<RequestContext, string>((IServiceProvider)innerScope)
-                        .Add<LoggingFilter>()
+                        .Add<LogRequestResponseFilter>()
                         .Add<ParseRequestFilter>()
                         .Add<NoopFilter>()
                         .Add<GetFileSizeFilter>()

@@ -11,20 +11,20 @@ namespace SageNetTuner.Filters
 
     using Tamarack.Pipeline;
 
-    public class LoggingFilter : IFilter<RequestContext,string>
+    public class LogRequestResponseFilter : IFilter<RequestContext,string>
     {
         private readonly Logger _logger;
 
-        public LoggingFilter(Logger logger)
+        public LogRequestResponseFilter(Logger logger)
         {
             _logger = logger;
         }
 
         public string Execute(RequestContext context, Func<RequestContext, string> executeNext)
         {
-            _logger.Debug("->> Request [{0}] ::::", context.Request);
+            _logger.Debug("========= >> Request [{0}] ==============", context.Request);
             var response =  executeNext(context);
-            _logger.Debug("<<- Response [{0}] {1} ::::", response, context.TunerState.ToString());
+            _logger.Debug("========= << Response [{0}] {1} =========", response, context.TunerState.ToString());
 
             return response;
         }

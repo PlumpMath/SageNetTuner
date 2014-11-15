@@ -84,7 +84,7 @@
     <Compile Include="Filters\BaseFilter.cs" />
     <Compile Include="Filters\FirmwareFilter.cs" />
     <Compile Include="Filters\GetSizeFilter.cs" />
-    <Compile Include="Filters\LoggingFilter.cs" />
+    <Compile Include="Filters\LogRequestResponseFilter.cs" />
     <Compile Include="Filters\NoopFilter.cs" />
     <Compile Include="Contracts\IRequestParser.cs" />
     <Compile Include="Filters\GetFileSizeFilter.cs" />
