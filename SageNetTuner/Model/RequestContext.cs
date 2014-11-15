@@ -3,8 +3,6 @@ using System.Text;
 
 namespace SageNetTuner.Model
 {
-    using SageNetTuner.Configuration;
-
     public class RequestContext
     {
 
@@ -12,6 +10,7 @@ namespace SageNetTuner.Model
         {
             Request = request;
             Settings = new RequestSettings();
+            TunerState = new TunerState();
         }
 
 
@@ -20,6 +19,7 @@ namespace SageNetTuner.Model
             RequestCommand = requestCommand;
             CommandArgs = args;
             Settings = new RequestSettings();
+            TunerState= new TunerState();
         }
 
 
@@ -35,19 +35,6 @@ namespace SageNetTuner.Model
 
         public RequestSettings Settings { get; private set; }
 
-
+        public TunerState TunerState { get; set; }
     }
-
-    public class RequestSettings
-    {
-
-        public TunerElement Tuner { get; set; }
-
-        public DeviceElement Device { get; set; }
-
-        public EncoderElement Encoder { get; set; }
-
-        public Lineup Lineup { get; set; }
-    }
-
 }

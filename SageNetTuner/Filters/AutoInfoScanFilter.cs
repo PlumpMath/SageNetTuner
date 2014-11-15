@@ -28,7 +28,7 @@
 
         protected override string OnExecute(RequestContext context)
         {
-            Logger.Debug("AutoInfoScanFilter.OnExecute()");
+            Logger.Trace("AutoInfoScanFilter.OnExecute()");
 
             var op = "";
             if (context.CommandArgs.Length > 0)

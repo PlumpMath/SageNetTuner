@@ -28,41 +28,45 @@
 
         protected override string OnExecute(RequestContext context)
         {
-            Logger.Debug("StartFilter.OnExecute()");
+            Logger.Trace("StartFilter.OnExecute()");
 
-            return StartRecording(context);
-        }
+            //var command = new StartCommand(context.CommandArgs[1], context.CommandArgs[3]);
 
-        private string StartRecording(RequestContext context)
-        {
+            var channel = context.CommandArgs[1];
+            var filename = context.CommandArgs[3];
 
-            var command = new StartCommand(context.CommandArgs[1], context.CommandArgs[3]);
-
-            Logger.Debug("StartRecording(): {0}", command);
+            Logger.Debug("StartRecording(): Channel={0}, Filename={1}", channel, filename);
 
             try
             {
                 // Find the requested channel to get the URL
-                var ch = (from x in context.Settings.Lineup.Channels where x.GuideNumber == command.Channel select x).FirstOrDefault();
+                var ch = (from x in context.Settings.Lineup.Channels where x.GuideNumber == channel select x).FirstOrDefault();
                 if (ch != null)
                 {
                     Logger.Debug("StartRecording(): Found Requested Channel: GuideName={0}, GuideNumber={1}, URL={2}", ch.GuideName, ch.GuideNumber, ch.URL);
 
-                    _executableProcessCapture.Start(ch, command.FileName);
+                    _executableProcessCapture.Start(ch, filename);
 
                     Logger.Trace("StartRecording(): Recording Started");
+
+                    context.TunerState.RecordingStarted(filename,ch);
 
                     return "OK";
                 }
                 else
                 {
+                    context.TunerState.RecordingStopped();
+
+                    _executableProcessCapture.Stop();
+
                     Logger.Warn("StartRecording(): Channel not found");
-                    return string.Format("ERROR Channel not found in device lineup. {0}", command.Channel);
+                    return string.Format("ERROR Channel not found in device lineup. {0}", channel);
                 }
 
             }
             catch (Exception ex)
             {
+                context.TunerState.RecordingStopped();
                 Logger.Error("StartRecording(): Exception trying start recording", ex);
                 return string.Format("ERROR {0}", ex.Message);
             }

@@ -30,8 +30,10 @@
         protected override string OnExecute(RequestContext context)
         {
 
-            Logger.Debug("StopFilter.OnExecute()");
+            Logger.Trace("StopFilter.OnExecute()");
             _executableProcessCapture.Stop();
+
+            context.TunerState.RecordingStopped();
 
             return "OK";
         }

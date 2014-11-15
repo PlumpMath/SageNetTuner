@@ -22,9 +22,9 @@ namespace SageNetTuner.Filters
 
         public string Execute(RequestContext context, Func<RequestContext, string> executeNext)
         {
-            _logger.Debug("---- Request [{0}] ----", context.Request);
+            _logger.Debug("->> Request [{0}] ::::", context.Request);
             var response =  executeNext(context);
-            _logger.Debug("---- Response [{0}] ----", response);
+            _logger.Debug("<<- Response [{0}] {1} ::::", response, context.TunerState.ToString());
 
             return response;
         }

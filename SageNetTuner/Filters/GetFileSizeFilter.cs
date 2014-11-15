@@ -26,7 +26,7 @@ namespace SageNetTuner.Filters
 
         protected override string OnExecute(RequestContext context)
         {
-            Logger.Debug("GetFileSizeFilter.OnExecute()");
+            Logger.Trace("GetFileSizeFilter.OnExecute()");
 
             return GetFileSize(context.CommandArgs[0]).ToString(CultureInfo.InvariantCulture);
         }
@@ -34,13 +34,13 @@ namespace SageNetTuner.Filters
         private long GetFileSize(string filename)
         {
 
-            Logger.Debug("GetFileSize: Filename={0}", filename);
             if (File.Exists(filename))
             {
                 try
                 {
                     var fi = new FileInfo(filename);
                     fi.Refresh();
+                    Logger.Trace("GetFileSize(): Filename={0}, Length={1:n0}", filename, fi.Length);
                     return fi.Length;
                 }
                 catch (Exception e)

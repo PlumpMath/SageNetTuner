@@ -49,7 +49,7 @@ namespace SageNetTuner.Filters
             //example Start rquest
             //START SageDCT-HDHomeRun Prime Tuner 131A21AF-1 Digital TV Tuner|752|2826835203582|D:\Recordings\PropertyBrothers-BeatrizBrandon-17756746-0.ts|Great
 
-            _logger.Debug("ParseRequestFilter.Execute()");
+            _logger.Trace("ParseRequestFilter.Execute()");
 
             var commandName = context.Request.Split(new[] { ' ' }, (StringSplitOptions)StringSplitOptions.RemoveEmptyEntries)[0];
 

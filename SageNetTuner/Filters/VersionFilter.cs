@@ -22,7 +22,7 @@
 
         protected override string OnExecute(RequestContext context)
         {
-            Logger.Debug("VersionFilter.OnExecute()");
+            Logger.Trace("VersionFilter.OnExecute()");
 
             return "2.1";
         }

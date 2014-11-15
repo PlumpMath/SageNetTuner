@@ -25,7 +25,7 @@ namespace SageNetTuner.Filters
 
         protected override string OnExecute(RequestContext context)
         {
-            Logger.Debug("NoopFilter.OnExecute()");
+            Logger.Trace("NoopFilter.OnExecute()");
 
             return "OK";
         }
