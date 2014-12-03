@@ -408,7 +408,7 @@ namespace SageNetTuner
                 {
                     Logger.Debug("Recording Stats: ");
                     Logger.Debug("  Filename: {0}", Filename);
-                    Logger.Debug("  Time: {0}", (_currentProcess.ExitTime - _currentProcess.StartTime));
+                    Logger.Debug("  Time: {0}", (_currentProcess.StartTime - _currentProcess.ExitTime));
                     Logger.Debug("  Size: {0:G}", GetFileSize());
                 }
 
