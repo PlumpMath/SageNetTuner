@@ -144,7 +144,7 @@ namespace SageNetTuner
             }))
             {
 
-                Logger.Info("HandleRequest: [{0}]", request);
+                Logger.Debug("HandleRequest: [{0}]", request);
                 try
                 {
 
@@ -170,7 +170,8 @@ namespace SageNetTuner
                     var response = pipeline.Execute(context);
 
                     Logger.Trace("IsRecording={0}, Channel={1}", _tunerState.IsRecording, _tunerState.Channel.GuideName);
-                    
+
+                    Logger.Info("Handled: Request=[{0}], Response=[{1}]", request, response);
                     return response;
 
 
