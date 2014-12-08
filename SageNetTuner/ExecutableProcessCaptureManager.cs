@@ -27,6 +27,8 @@ namespace SageNetTuner
 
         private Process _currentProcess;
 
+        private Stopwatch _stopwatch;
+
         private FileStream _recordingFileStream;
 
         private object[] _replacmentParams;
@@ -245,6 +247,9 @@ namespace SageNetTuner
                 //Allow the process to start creating the file
                 WaitForRecordingToStart();
 
+                _stopwatch = new Stopwatch();
+                _stopwatch.Start();
+
             }
         }
 
@@ -359,7 +364,7 @@ namespace SageNetTuner
         void ProcessExitedHandler(object sender, EventArgs e)
         {
             var proc = (Process)sender;
-            Logger.Info("Process {0} has exited with code {1}", proc.Id, proc.ExitCode);
+            Logger.Debug("Process {0} has exited with code {1}", proc.Id, proc.ExitCode);
 
         }
 
@@ -404,14 +409,18 @@ namespace SageNetTuner
                 if (!_currentProcess.HasExited)
                     _currentProcess.Kill();
 
+
+                _stopwatch.Stop();
+                
                 if (Logger.IsDebugEnabled)
                 {
                     Logger.Debug("Recording Stats: ");
                     Logger.Debug("  Filename: {0}", Filename);
-                    Logger.Debug("  Time: {0}", (_currentProcess.StartTime - _currentProcess.ExitTime));
+                    Logger.Debug("  Time: {0}", (_stopwatch.Elapsed));
                     Logger.Debug("  Size: {0:G}", GetFileSize());
                 }
 
+                _stopwatch = null;
                 Filename = "";
                 Logger.Info("{0} stopped", _executableName);
             }
