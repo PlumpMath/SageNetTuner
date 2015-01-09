@@ -11,18 +11,18 @@
             ElementKey = "name";
         }
 
-        [ConfigurationProperty("name", IsRequired = true)]
-        public string Name
-        {
-            get
-            {
-                return (string)base["name"];
-            }
-            set
-            {
-                base["name"] = value;
-            }
-        }
+        //[ConfigurationProperty("name", IsRequired = false)]
+        //public string Name
+        //{
+        //    get
+        //    {
+        //        return (string)base["name"];
+        //    }
+        //    set
+        //    {
+        //        base["name"] = value;
+        //    }
+        //}
 
         [ConfigurationProperty("path", IsRequired = true)]
         public string Path
@@ -59,7 +59,7 @@
             }
         }
 
-        [ConfigurationProperty("event", IsRequired = true)]
+        [ConfigurationProperty("event", IsRequired = true, DefaultValue = CommandEvent.Start)]
         public CommandEvent Event
         {
             get

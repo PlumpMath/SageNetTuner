@@ -74,8 +74,8 @@
     <Compile Include="Configuration\CommandElementCollection.cs" />
     <Compile Include="Configuration\DeviceElement.cs" />
     <Compile Include="Configuration\DeviceElementCollection.cs" />
-    <Compile Include="Configuration\EncoderElement.cs" />
-    <Compile Include="Configuration\EncoderElementCollection.cs" />
+    <Compile Include="Configuration\CaptureProfileElement.cs" />
+    <Compile Include="Configuration\CaptureProfileElementCollection.cs" />
     <Compile Include="Configuration\IConfigurationElementCollectionElement.cs" />
     <Compile Include="Configuration\SageNetTunerSection.cs" />
     <Compile Include="Configuration\TunerElement.cs" />
@@ -117,7 +117,9 @@
     <Compile Include="XmlHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

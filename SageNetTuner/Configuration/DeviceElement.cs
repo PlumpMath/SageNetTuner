@@ -37,6 +37,17 @@
             }
         }
 
+        [ConfigurationProperty("tuners")]
+        public TunerElementCollection Tuners
+        {
+            get
+            {
+                return (TunerElementCollection)base["tuners"];
+            }
+        }
+
+
+
         public override string ToString()
         {
             return string.Format("{0}@{1}", Name,Address);

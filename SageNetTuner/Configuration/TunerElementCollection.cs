@@ -2,9 +2,12 @@
 {
     using System.Configuration;
 
-    [ConfigurationCollection(typeof(TunerElement), CollectionType = ConfigurationElementCollectionType.AddRemoveClearMap)]
+    [ConfigurationCollection(typeof(TunerElement), AddItemName = CONST_ELEMENT_NAME, CollectionType = ConfigurationElementCollectionType.BasicMap)]
     public class TunerElementCollection : BaseConfigurationElementCollection<TunerElement>
     {
+
+        private const string CONST_ELEMENT_NAME = "tuner";
+
         protected override ConfigurationElement CreateNewElement()
         {
             return new TunerElement();
@@ -15,23 +18,21 @@
             return (element as TunerElement).Name;
         }
 
-
-        public TunerElement this[int index]
+        protected override string ElementName
         {
             get
             {
-                return (TunerElement)base.BaseGet(index);
-            }
-            set
-            {
-                if (base.BaseGet(index) != null)
-                {
-                    base.BaseRemoveAt(index);
-
-                }
-                base.BaseAdd(index, value);
+                return CONST_ELEMENT_NAME;
             }
         }
+        public override ConfigurationElementCollectionType CollectionType
+        {
+            get
+            {
+                return ConfigurationElementCollectionType.BasicMap;
+            }
+        }
+
 
         public new TunerElement this[string id]
         {

@@ -18,7 +18,7 @@
 
         #region Implementation of IEnumerable<TConfigurationElementType>
 
-        public IEnumerator<TConfigurationElementType> GetEnumerator()
+        public new IEnumerator<TConfigurationElementType> GetEnumerator()
         {
             foreach (TConfigurationElementType type in (IEnumerable)this)
             {
@@ -100,26 +100,25 @@
 
         #endregion
 
+        //[ConfigurationCollection(typeof(TunerElement), AddItemName = CONST_ELEMENT_NAME, CollectionType = ConfigurationElementCollectionType.BasicMap)]
+        //public class CustomConfigurationCollection : BaseConfigurationElementCollection<TunerElement>
+        //{
+        //    #region Constants
+        //    private const string CONST_ELEMENT_NAME = "Custom";
+        //    #endregion
 
-        [ConfigurationCollection(typeof(TunerElement), AddItemName = CONST_ELEMENT_NAME, CollectionType = ConfigurationElementCollectionType.BasicMap)]
-        public class CustomConfigurationCollection : BaseConfigurationElementCollection<TunerElement>
-        {
-            #region Constants
-            private const string CONST_ELEMENT_NAME = "Custom";
-            #endregion
+        //    public override ConfigurationElementCollectionType CollectionType
+        //    {
+        //        get
+        //        {
+        //            return ConfigurationElementCollectionType.BasicMap;
+        //        }
+        //    }
 
-            public override ConfigurationElementCollectionType CollectionType
-            {
-                get
-                {
-                    return ConfigurationElementCollectionType.BasicMap;
-                }
-            }
-
-            protected override string ElementName
-            {
-                get { return CONST_ELEMENT_NAME; }
-            }
-        }
+        //    protected override string ElementName
+        //    {
+        //        get { return CONST_ELEMENT_NAME; }
+        //    }
+        //}
     }
 }

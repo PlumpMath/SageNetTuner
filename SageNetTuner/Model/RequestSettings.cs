@@ -9,7 +9,7 @@
 
         public DeviceElement Device { get; set; }
 
-        public EncoderElement Encoder { get; set; }
+        public CaptureProfileElement CaptureProfile { get; set; }
 
         public Lineup Lineup { get; set; }
     }
