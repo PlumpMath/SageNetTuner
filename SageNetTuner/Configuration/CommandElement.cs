@@ -86,6 +86,20 @@
             }
         }
 
+        [ConfigurationProperty("settings", IsRequired = false)]
+        public NameValueConfigurationCollection Settings
+        {
+            get
+            {
+                return (NameValueConfigurationCollection)base["settings"];
+            }
+            set
+            {
+                base["settings"] = value;
+            }
+        }
+
+
 
         public object ElementKey { get; private set; }
     }

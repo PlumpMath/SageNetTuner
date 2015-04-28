@@ -2,6 +2,7 @@
 namespace SageNetTuner
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -35,7 +36,7 @@ namespace SageNetTuner
 
         private CommandElement _currentCommand;
 
-        private string _executableName;
+        private readonly string _executableName;
 
         public string Filename { get; private set; }
 
@@ -253,8 +254,38 @@ namespace SageNetTuner
             }
         }
 
+
+        private bool ShouldWaitForRecordingToStart(CommandElement currentCommand)
+        {
+
+            const string Name = "WaitForRecordingToStart";
+
+            if (currentCommand.Settings[Name]!=null)
+            {
+                var value = currentCommand.Settings[Name].Value;
+                Logger.Trace("{0}={1}", Name,value);
+
+                bool result;
+                if (Boolean.TryParse(value, out result)) 
+                    return result;
+
+            }
+
+            Logger.Trace("Default {0}=True");
+            return true;
+        }
+
         private void WaitForRecordingToStart()
         {
+
+            if (!ShouldWaitForRecordingToStart(_currentCommand))
+            {
+                Logger.Debug("Not waiting for recording to start");
+                return;
+            }
+
+            Logger.Debug("Waiting for recording to start. DelayAfterStart={0}", _currentCommand.DelayAfterStart);
+
             if (GetFileSize() <= 0)
             {
                 var stopwatch = Stopwatch.StartNew();
