@@ -393,8 +393,26 @@ namespace SageNetTuner
 
         void ProcessExitedHandler(object sender, EventArgs e)
         {
-            var proc = (Process)sender;
-            Logger.Debug("Process {0} has exited with code {1}", proc.Id, proc.ExitCode);
+            var proc = sender as Process;
+            if (proc != null)
+            {
+                try
+                {
+                    Logger.Debug("Process has exited with code {0}", proc.ExitCode);
+
+                }
+                catch (Exception ex)
+                {
+
+                    Logger.Warn(
+                        "ProcessExitHandler called, but an exception occurred while trying to access the process information",
+                        ex);
+                }
+            }
+            else
+            {
+                Logger.Debug("ProcessExitHandler called, but no Process object available");
+            }
 
         }
 
