@@ -1,6 +1,7 @@
 ﻿namespace SageNetTuner
 {
     using System;
+    using System.Configuration;
     using System.Reflection;
     using System.Reflection.Emit;
 
@@ -8,6 +9,7 @@
 
     using NLog;
 
+    using SageNetTuner.Configuration;
     using SageNetTuner.Contracts;
     using SageNetTuner.Model;
 
@@ -64,7 +66,21 @@
         {
             var builder = new ContainerBuilder();
 
-            builder.RegisterInstance(Configuration.SageNetTunerSection.Settings);
+
+            try
+            {
+                var settings = SageNetTunerSection.Settings;
+                builder.RegisterInstance(SageNetTunerSection.Settings);
+            }
+            catch (TypeInitializationException e)
+            {
+
+                if (e.InnerException != null && e.InnerException.GetType() == typeof(ConfigurationErrorsException))
+                {
+                    Logger.Error(e.InnerException.Message, e.InnerException);
+                }
+                throw;
+            }
 
             builder.RegisterType<NetworkTunerService>();
             builder.RegisterType<Providers.HDHomeRunChannelProvider>().As<IChannelProvider>();

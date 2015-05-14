@@ -2,6 +2,7 @@
 namespace SageNetTuner
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -17,7 +18,7 @@ namespace SageNetTuner
 
     public class ExecutableProcessCaptureManager : ICaptureManager
     {
-        private readonly EncoderElement _encoder;
+        private readonly CaptureProfileElement _captureProfile;
 
         private readonly TunerElement _tuner;
 
@@ -35,7 +36,7 @@ namespace SageNetTuner
 
         private CommandElement _currentCommand;
 
-        private string _executableName;
+        private readonly string _executableName;
 
         public string Filename { get; private set; }
 
@@ -43,14 +44,14 @@ namespace SageNetTuner
         [DllImport("User32.dll")]
         public static extern bool SetWindowText(IntPtr hwnd, string title);
 
-        public ExecutableProcessCaptureManager(EncoderElement encoder, TunerElement tuner)
+        public ExecutableProcessCaptureManager(CaptureProfileElement captureProfile, TunerElement tuner)
         {
-            _encoder = encoder;
+            _captureProfile = captureProfile;
             _tuner = tuner;
 
-            var startCommand = GetStartCommand(encoder);
+            var startCommand = GetStartCommand(captureProfile);
 
-            Logger = LogManager.GetLogger(tuner.Name + ":" + _encoder.Name);
+            Logger = LogManager.GetLogger(tuner.Name + ":" + _captureProfile.Name);
 
             _executableName = Path.GetFileNameWithoutExtension(startCommand.Path);
 
@@ -62,43 +63,43 @@ namespace SageNetTuner
 
         }
 
-        private CommandElement GetStartCommand(EncoderElement encoder)
+        private CommandElement GetStartCommand(CaptureProfileElement captureProfile)
         {
             CommandElement startCommand;
-            if (!string.IsNullOrEmpty(encoder.Path))
+            if (!string.IsNullOrEmpty(captureProfile.Path))
             {
                 //  Since they defined a Path/CommandLineFormat on the element 
                 //  we'll use it instead of one that might have been defined in the Commands
-                startCommand = encoder.Commands.FirstOrDefault(c => c.Event == CommandEvent.Start);
+                startCommand = captureProfile.Commands.FirstOrDefault(c => c.Event == CommandEvent.Start);
                 if (startCommand != null)
                 {
-                    encoder.Commands.Remove(startCommand);
+                    captureProfile.Commands.Remove(startCommand);
                 }
                 startCommand = new CommandElement()
                                    {
-                                       Name = "__StartRecording",
+                                       //Name = "__StartRecording",
                                        Event = CommandEvent.Start,
-                                       Path = encoder.Path,
-                                       CommandLineFormat = encoder.CommandLineFormat,
+                                       Path = captureProfile.Path,
+                                       CommandLineFormat = captureProfile.CommandLineFormat,
                                        DelayAfterStart = TimeSpan.FromSeconds(0),
                                    };
-                encoder.Commands.Add(startCommand);
+                captureProfile.Commands.Add(startCommand);
             }
             else
             {
-                if (!encoder.Commands.Any())
+                if (!captureProfile.Commands.Any())
                 {
                     throw new InvalidOperationException(
-                        string.Format("No commands defined for this encoder: name={0}", encoder.Name));
+                        string.Format("No commands defined for this CaptureProfile: name={0}", captureProfile.Name));
                 }
 
-                if (encoder.Commands.All(c => c.Event != CommandEvent.Start))
+                if (captureProfile.Commands.All(c => c.Event != CommandEvent.Start))
                 {
                     throw new InvalidOperationException(
-                        string.Format("No START event commands defined for this encoder: name={0}", encoder.Name));
+                        string.Format("No START event commands defined for this CaptureProfile: name={0}", captureProfile.Name));
                 }
 
-                startCommand = encoder.Commands.FirstOrDefault(c => c.Event == CommandEvent.Start);
+                startCommand = captureProfile.Commands.FirstOrDefault(c => c.Event == CommandEvent.Start);
             }
 
             if (!File.Exists(startCommand.Path))
@@ -206,7 +207,7 @@ namespace SageNetTuner
 
             // --- START executable process to begin recording
 
-            var startCommand = _encoder.Commands.FirstOrDefault(c => c.Event == CommandEvent.Start);
+            var startCommand = _captureProfile.Commands.FirstOrDefault(c => c.Event == CommandEvent.Start);
             if (startCommand != null)
             {
                 var args = string.Format(startCommand.CommandLineFormat, _replacmentParams);
@@ -253,12 +254,41 @@ namespace SageNetTuner
             }
         }
 
+
+        private bool ShouldWaitForRecordingToStart(CommandElement currentCommand)
+        {
+
+            const string Name = "WaitForRecordingToStart";
+
+            if (currentCommand.Settings[Name]!=null)
+            {
+                var value = currentCommand.Settings[Name].Value;
+                Logger.Trace("{0}={1}", Name,value);
+
+                bool result;
+                if (Boolean.TryParse(value, out result)) 
+                    return result;
+
+            }
+
+            Logger.Trace("Default {0}=True");
+            return true;
+        }
+
         private void WaitForRecordingToStart()
         {
+
+            if (!ShouldWaitForRecordingToStart(_currentCommand))
+            {
+                Logger.Debug("Not waiting for recording to start");
+                return;
+            }
+
+            Logger.Debug("Waiting for recording to start. DelayAfterStart={0}", _currentCommand.DelayAfterStart);
+
             if (GetFileSize() <= 0)
             {
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
+                var stopwatch = Stopwatch.StartNew();
                 do
                 {
                     Thread.Sleep(500);
@@ -279,7 +309,7 @@ namespace SageNetTuner
 
         private void ExecuteEventCommands(CommandEvent commandEvent, object[] replacmentParams)
         {
-            var commands = _encoder.Commands.Where(c => c.Event == commandEvent).ToList();
+            var commands = _captureProfile.Commands.Where(c => c.Event == commandEvent).ToList();
             foreach (var command in commands)
             {
 
@@ -303,12 +333,12 @@ namespace SageNetTuner
                     {
                         process.Kill();
                         process.WaitForExit((int)TimeSpan.FromSeconds(15).TotalMilliseconds);
-                        throw new ApplicationException(string.Format("{0} command did not exit within timeout: name={1}, timeout=15 seconds", commandEvent, command.Name));
+                        throw new ApplicationException(string.Format("{0} command did not exit within timeout: args={1}, timeout=15 seconds", commandEvent,args));
                     }
 
                     if (process.ExitCode != 0)
                     {
-                        throw new ApplicationException(string.Format("{0} command failed: name={1}", commandEvent, command.Name));
+                        throw new ApplicationException(string.Format("{0} command failed: args={1}", commandEvent, args));
                     }
                 }
             }
@@ -363,8 +393,26 @@ namespace SageNetTuner
 
         void ProcessExitedHandler(object sender, EventArgs e)
         {
-            var proc = (Process)sender;
-            Logger.Debug("Process {0} has exited with code {1}", proc.Id, proc.ExitCode);
+            var proc = sender as Process;
+            if (proc != null)
+            {
+                try
+                {
+                    Logger.Debug("Process has exited with code {0}", proc.ExitCode);
+
+                }
+                catch (Exception ex)
+                {
+
+                    Logger.Warn(
+                        "ProcessExitHandler called, but an exception occurred while trying to access the process information",
+                        ex);
+                }
+            }
+            else
+            {
+                Logger.Debug("ProcessExitHandler called, but no Process object available");
+            }
 
         }
 
@@ -407,8 +455,9 @@ namespace SageNetTuner
                 }
 
                 if (!_currentProcess.HasExited)
+                {
                     _currentProcess.Kill();
-
+                }
 
                 _stopwatch.Stop();
                 
@@ -433,8 +482,6 @@ namespace SageNetTuner
             {
                 Cleanup();
             }
-
-            ExecuteEventCommands(CommandEvent.Stop, _replacmentParams);
 
             ExecuteEventCommands(CommandEvent.AfterStop, _replacmentParams);
 

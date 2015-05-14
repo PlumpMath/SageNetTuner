@@ -3,9 +3,9 @@
     using System;
     using System.Configuration;
 
-    public class EncoderElement : ConfigurationElement, IConfigurationElementCollectionElement
+    public class CaptureProfileElement : ConfigurationElement, IConfigurationElementCollectionElement
     {
-        public EncoderElement()
+        public CaptureProfileElement()
         {
             ElementKey = "name";
         }

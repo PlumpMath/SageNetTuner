@@ -23,12 +23,12 @@
         }
 
 
-        [ConfigurationProperty("encoders")]
-        public EncoderElementCollection Encoders
+        [ConfigurationProperty("captureProfiles")]
+        public CaptureProfileElementCollection CaptureProfiles
         {
             get
             {
-                return (EncoderElementCollection)base["encoders"];
+                return (CaptureProfileElementCollection)base["captureProfiles"];
             }
         }
 
@@ -38,15 +38,6 @@
             get
             {
                 return (ChannelProviderElementCollection)base["channelProviders"];
-            }
-        }
-
-        [ConfigurationProperty("tuners")]
-        public TunerElementCollection Tuners
-        {
-            get
-            {
-                return (TunerElementCollection)base["tuners"];
             }
         }
 

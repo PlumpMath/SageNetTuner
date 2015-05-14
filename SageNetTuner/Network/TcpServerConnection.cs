@@ -139,11 +139,11 @@ namespace SageNetTuner.Network
             {
                 rc = this._messagesToSend.Count > 0 || (this.Socket.Available > 0 && this.CanStartNewThread());
             }
-            catch (ObjectDisposedException e)
+            catch (ObjectDisposedException)
             {
                 rc = false;
             }
-            catch (SocketException e)
+            catch (SocketException)
             {
                 rc = false;
             }

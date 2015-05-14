@@ -27,7 +27,8 @@
             }
         }
 
-        [ConfigurationProperty("listenerPort", IsRequired = true)]
+        [ConfigurationProperty("listenerPort", IsRequired = true, DefaultValue = 1)]
+        [IntegerValidator(MinValue = 1, MaxValue = 65536)]
         public int ListenerPort
         {
             get
@@ -36,27 +37,27 @@
             }
         }
 
-        [ConfigurationProperty("encoder", IsRequired = true)]
+        [ConfigurationProperty("captureProfile", IsRequired = true)]
         public string Encoder
         {
             get
             {
-                return (string)base["encoder"];
+                return (string)base["captureProfile"];
             }
         }
 
-        [ConfigurationProperty("device", IsRequired = true)]
-        public string Device
-        {
-            get
-            {
-                return (string)base["device"];
-            }
-        }
+        //[ConfigurationProperty("device", IsRequired = true)]
+        //public string Device
+        //{
+        //    get
+        //    {
+        //        return (string)base["device"];
+        //    }
+        //}
 
 
-        [ConfigurationProperty("id", IsRequired = true)]
-        public string Id { get; set; }
+        [ConfigurationProperty("sageTvId", IsRequired = true)]
+        public string SageTvId { get; set; }
        
 
 

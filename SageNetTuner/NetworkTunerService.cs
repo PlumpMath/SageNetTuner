@@ -42,7 +42,7 @@
             _servers = new List<TcpServer>();
             _processors = new List<SageCommandProcessor>();
 
-            
+
         }
 
 
@@ -50,22 +50,23 @@
         {
 
             Logger.Info("Starting...");
-            foreach (var tuner in _settings.Tuners)
+            foreach (var device in _settings.Devices)
             {
-                var device = _settings.Devices[tuner.Device];
-
-                Logger.Info("Tuner: Name={0}, Enabled={3}, Device={1}, Port={2}", tuner.Name, device, tuner.ListenerPort, tuner.Enabled);
-
-                if (tuner.Enabled)
+                foreach (var tuner in device.Tuners)
                 {
+                    //var device = _settings.Devices[tuner.Device];
 
+                    Logger.Info("Tuner: Name={0}, Enabled={3}, Device={1}, Port={2}", tuner.Name, device, tuner.ListenerPort, tuner.Enabled);
 
-                    var logger = LogManager.GetLogger(tuner.Name);
-                    var encoder = _settings.Encoders[tuner.Encoder];
+                    if (tuner.Enabled)
+                    {
+                        var logger = LogManager.GetLogger(tuner.Name);
+                        var encoder = _settings.CaptureProfiles[tuner.Encoder];
 
-                    //Create a LifetimeScope for this tuner
-                    var innerScope = _lifetimeScope.BeginLifetimeScope("tuner",
-                        builder =>
+                        //Create a LifetimeScope for this tuner
+                        var innerScope = _lifetimeScope.BeginLifetimeScope(
+                            "tuner",
+                            builder =>
                             {
                                 builder.RegisterInstance(logger);
                                 builder.RegisterInstance(tuner);
@@ -74,26 +75,27 @@
                                 builder.RegisterInstance(GetChannelProvider(device)).As<IChannelProvider>();
                             });
 
-                    //Get a Processor from the innerScope
-                    var p = innerScope.Resolve<SageCommandProcessor>();
+                        //Get a Processor from the innerScope
+                        var p = innerScope.Resolve<SageCommandProcessor>();
 
-                    p.Initialize();
-                    _processors.Add(p);
+                        p.Initialize();
+                        _processors.Add(p);
 
 
-                    var t = new TcpServer { Port = tuner.ListenerPort };
-                    t.OnConnect += p.OnConnect;
-                    t.OnDataAvailable += p.OnDataAvailable;
-                    t.OnError += p.OnError;
+                        var t = new TcpServer { Port = tuner.ListenerPort };
+                        t.OnConnect += p.OnConnect;
+                        t.OnDataAvailable += p.OnDataAvailable;
+                        t.OnError += p.OnError;
 
-                    t.Open();
+                        t.Open();
 
-                    _servers.Add(t);
+                        _servers.Add(t);
 
-                    hostControl.RequestAdditionalTime(TimeSpan.FromSeconds(5));
+                        hostControl.RequestAdditionalTime(TimeSpan.FromSeconds(5));
+                    }
                 }
             }
-             
+
 
             if (_settings.EnableDiscovery)
             {
@@ -126,7 +128,7 @@
             else
                 channelProvider = (IChannelProvider)Activator.CreateInstance(channelProviderType);
 
-            if (channelProvider!=null)
+            if (channelProvider != null)
                 Logger.Info("Created ChannelProvider:[{0}] ", channelProvider.GetType().FullName);
 
             return channelProvider;
@@ -159,22 +161,25 @@
                         var request = new EncoderRequest();
                         request.Deserialize(ref data);
 
-                        foreach (var tuner in _settings.Tuners)
+                        foreach (var device in _settings.Devices)
                         {
-
-                            if (tuner.Enabled)
+                            foreach (var tuner in device.Tuners)
                             {
-                                var response = new EncoderResponse
-                                                   {
-                                                       Name = tuner.Name,
-                                                       Length = tuner.Name.Length,
-                                                       Prefix = request.Prefix,
-                                                       Version = "210",
-                                                       Port = (uint)tuner.ListenerPort
-                                                   };
 
-                                Logger.Debug("Sending:{0}", response);
-                                sw.Write(response);
+                                if (tuner.Enabled)
+                                {
+                                    var response = new EncoderResponse
+                                                       {
+                                                           Name = tuner.Name,
+                                                           Length = tuner.Name.Length,
+                                                           Prefix = request.Prefix,
+                                                           Version = "210",
+                                                           Port = (uint)tuner.ListenerPort
+                                                       };
+
+                                    Logger.Debug("Sending:{0}", response);
+                                    sw.Write(response);
+                                }
                             }
                         }
 
