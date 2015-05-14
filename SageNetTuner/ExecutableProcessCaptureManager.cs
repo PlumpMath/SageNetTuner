@@ -414,10 +414,11 @@ namespace SageNetTuner
                 
                 if (Logger.IsDebugEnabled)
                 {
-                    Logger.Debug("Recording Stats: ");
-                    Logger.Debug("  Filename: {0}", Filename);
-                    Logger.Debug("  Time: {0}", (_stopwatch.Elapsed));
-                    Logger.Debug("  Size: {0:G}", GetFileSize());
+                    LogEventInfo debug = new LogEventInfo(LogLevel.Info,Logger.Name,"Recording Stats");
+                    debug.Properties.Add("Filename",Filename);
+                    debug.Properties.Add("Elapsed", _stopwatch.Elapsed);
+                    debug.Properties.Add("Size", GetFileSize());
+                    Logger.Log(debug);
                 }
 
                 _stopwatch = null;

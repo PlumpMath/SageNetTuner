@@ -61,12 +61,12 @@ namespace SageNetTuner.Filters
 
             if (_logger.IsTraceEnabled)
             {
-                _logger.Trace("  Command={0}", commandName);
-                _logger.Trace("  CommandArgs:");
+                LogEventInfo trace = new LogEventInfo(LogLevel.Info, _logger.Name, string.Format("Command={0}", commandName));
                 for (int i = 0; i < commandArgs.Length; i++)
                 {
-                    _logger.Trace("    {0}:{1}", i, commandArgs[i]);
+                    trace.Properties.Add(string.Format("commandArgs[{0}]",i), commandArgs[i]);
                 }
+                _logger.Log(trace);
             }
 
             context.RequestCommandName = commandName;
